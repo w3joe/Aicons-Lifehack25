@@ -2,7 +2,7 @@ package aicon.lifehack.central_learning.controller;
 
 import aicon.lifehack.central_learning.model.User;
 import aicon.lifehack.central_learning.service.UserService;
-
+import aicon.lifehack.central_learning.dto.UpdateUserDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
@@ -71,27 +71,21 @@ public class UserController {
      * Returns 200 OK with the confirmation message.
      * Consider throwing ResourceNotFoundException if user.getId() is for a non-existent user.
      */
-    @PutMapping
-    public ResponseEntity<?> updateUser(@RequestBody User user) throws ExecutionException, InterruptedException {
-        // Check if the user ID is provided in the request body
-        if (user.getUser_id() == null || user.getUser_id().isEmpty()) {
-            // You might want a more specific response, like a 400 Bad Request
-            //throw new IllegalArgumentException("User ID must be provided for an update.");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID must be provided for an update.");
-        }
+    @PutMapping("/{userId}")
+    public ResponseEntity<?> updateUser(@PathVariable String userId, @RequestBody UpdateUserDTO updateUserDTO)
+        throws ExecutionException, InterruptedException {
     
-    boolean updated = UserService.updateUser(user);
+    User updatedUser = UserService.updateUser(userId, updateUserDTO);
 
-        if (updated) {
-            // Return 200 OK with the user object that was just updated.
-            return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(user));
-        } else {
-            // Let the GlobalExceptionHandler handle this for a clean 404 response
-            //throw new ResourceNotFoundException("Cannot update. User not found with ID: " + user.getUserid());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + user.getUser_id()));
-        }
-
+    if (updatedUser != null) {
+        // Return 200 OK with the updated user object.
+        //return ResponseEntity.ok(updatedUser);
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(updatedUser));
+    } else {
+        // Let the GlobalExceptionHandler handle this for a clean 404 response
+         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + userId));
     }
+}
 
     // In UserController.java
     @DeleteMapping("{id}")
