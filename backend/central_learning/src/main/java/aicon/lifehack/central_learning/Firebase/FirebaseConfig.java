@@ -9,20 +9,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.io.InputStream;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
+import org.springframework.core.io.ClassPathResource;
 
 @Configuration
 public class FirebaseConfig {
 
-    // Inject the path from application.properties
-    @Value("${app.firebase.service-account-key-path}")
-    private Resource serviceAccountResource;
-
     @Bean
     public Firestore firestore() throws IOException {
         // Use a service account
-        InputStream serviceAccount = serviceAccountResource.getInputStream();
+        ClassPathResource resource = new ClassPathResource("central-learning-test-firebase-adminsdk.json");
+        InputStream serviceAccount = resource.getInputStream();
 
         FirebaseOptions options = FirebaseOptions.builder()
         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
