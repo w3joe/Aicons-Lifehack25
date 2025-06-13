@@ -1,15 +1,21 @@
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+/*import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
 import React from 'react';
+
 import { Image } from 'react-native';
 import CourseScreen from './screens/CourseScreen';
 import HomeScreen from './screens/HomeScreen';
 
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
+
 
 export default function App() {
   return (
-      <Tab.Navigator
+      <NavigationContainer
         screenOptions={({ route }) => ({
           headerShown: false,
           tabBarIcon: ({ focused, color, size }) => {
@@ -34,8 +40,8 @@ export default function App() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tab.Screen name="Home" component={HomeScreen} />
-        <Tab.Screen name="Course" component={CourseScreen} />
-      </Tab.Navigator>
+        <Stack.Screen name="Home" component={HomeScreen} />
+        <Stack.Screen name="Course" component={CourseScreen} />
+      </NavigationContainer>
   );
-}
+}*/
