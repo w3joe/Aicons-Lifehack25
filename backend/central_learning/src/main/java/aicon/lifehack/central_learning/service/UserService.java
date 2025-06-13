@@ -45,7 +45,7 @@ public class UserService {
     public User createUser(User user) throws ExecutionException, InterruptedException {
     // Let Firestore auto-generate the ID
     DocumentReference docRef = firestore.collection(COLLECTION_NAME).document();
-    user.setUserid(docRef.getId()); // Set the auto-generated ID to the user object
+    user.setUser_id(docRef.getId()); // Set the auto-generated ID to the user object
     // Asynchronously write the data and wait for the result to ensure it's saved
     ApiFuture<WriteResult> result = docRef.set(user);
     result.get(); // .get() waits for the operation to complete
@@ -54,7 +54,7 @@ public class UserService {
 
     public boolean updateUser(User user) throws ExecutionException, InterruptedException {
     // 1. Get a reference to the document using the ID from the user object.
-    DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(user.getUserid());
+    DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(user.getUser_id());
 
     // 2. Check if the document actually exists.
     ApiFuture<DocumentSnapshot> existenceCheck = docRef.get();

@@ -33,7 +33,7 @@ public class UserController {
         User createdUser = UserService.createUser(user);
 
         // Build the URI for the 'Location' header
-        URI location = URI.create("/api/users/" + createdUser.getUserid());
+        URI location = URI.create("/api/users/" + createdUser.getUser_id());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.created(location).body(createdUser));
     }
@@ -72,7 +72,7 @@ public class UserController {
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user) throws ExecutionException, InterruptedException {
         // Check if the user ID is provided in the request body
-        if (user.getUserid() == null || user.getUserid().isEmpty()) {
+        if (user.getUser_id() == null || user.getUser_id().isEmpty()) {
             // You might want a more specific response, like a 400 Bad Request
             //throw new IllegalArgumentException("User ID must be provided for an update.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID must be provided for an update.");
@@ -85,7 +85,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(user));
         } else {
             // Let the GlobalExceptionHandler handle this for a clean 404 response
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + user.getUserid()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + user.getUser_id()));
         }
 
     }
