@@ -6,9 +6,11 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.google.cloud.firestore.SetOptions;
 import com.google.cloud.firestore.WriteResult;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -23,10 +25,10 @@ public class UserService {
         this.firestore = firestore;
     }
 
-    public User getUser(String documentId) throws ExecutionException, InterruptedException {
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(documentId);
-        ApiFuture<DocumentSnapshot> future = docRef.get();
-        DocumentSnapshot document = future.get();
+    
+    public User getUser(String userId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
+        DocumentSnapshot document = docRef.get().get();
         if (document.exists()) {
             return document.toObject(User.class);
         }
@@ -43,47 +45,47 @@ public class UserService {
     }
 
     public User createUser(User user) throws ExecutionException, InterruptedException {
-    // Let Firestore auto-generate the ID
-    DocumentReference docRef = firestore.collection(COLLECTION_NAME).document();
-    user.setUserid(docRef.getId()); // Set the auto-generated ID to the user object
-    // Asynchronously write the data and wait for the result to ensure it's saved
-    ApiFuture<WriteResult> result = docRef.set(user);
-    result.get(); // .get() waits for the operation to complete
-    return user; // Return the user object, now with the ID
+        // 1. Generate the unique ID from Firestore
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document();
+        
+        // 2. Set the server-side fields
+        user.setUser_id(docRef.getId()); // Set the user_id
+        user.setCreated_at(new Date());  
+        // user.setPassword(passwordEncoder.encode(user.getPassword()));
+        
+        // 3. Save the user object to Firestore
+        docRef.set(user).get(); // .get() waits for the write to complete
+        
+        return user;
     }
 
     public boolean updateUser(User user) throws ExecutionException, InterruptedException {
-    // 1. Get a reference to the document using the ID from the user object.
-    DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(user.getUserid());
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(user.getUser_id());
+        DocumentSnapshot document = docRef.get().get();
 
-    // 2. Check if the document actually exists.
-    ApiFuture<DocumentSnapshot> existenceCheck = docRef.get();
-    DocumentSnapshot document = existenceCheck.get();
-
-    if (document.exists()) {
-        // 3. If it exists, perform the update.
-        docRef.set(user);
-        return true; // Signal that the update was successful.
-    } else {
-        // 4. If it does not exist, do nothing and signal failure.
-        return false;
-    }
-}
-
-   // In FirebaseService.java
-public boolean deleteUser(String documentId) throws ExecutionException, InterruptedException {
-    DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(documentId);
-    
-    // 1. First, get the document to see if it exists.
-    DocumentSnapshot document = docRef.get().get(); 
-    
         if (document.exists()) {
-            // 2. If it exists, delete it.
-            docRef.delete();
-            return true; // Deletion was successful
+            // Be careful about what fields you allow to be updated.
+            // For example, you probably don't want to change 'createdAt'.
+            // A more advanced implementation would use a DTO (Data Transfer Object) here.
+            docRef.set(user, SetOptions.merge()); // Use merge to avoid overwriting createdAt if not provided
+            return true;
         } else {
-            // 3. If it doesn't exist, do nothing and report back.
-            return false; // User was not found
+            return false;
         }
     }
+
+
+
+   public boolean deleteUser(String userId) throws ExecutionException, InterruptedException {
+        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
+        DocumentSnapshot document = docRef.get().get();
+        
+        if (document.exists()) {
+            docRef.delete();
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 }
