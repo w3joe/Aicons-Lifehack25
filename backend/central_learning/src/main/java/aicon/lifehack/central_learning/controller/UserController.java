@@ -33,7 +33,7 @@ public class UserController {
         User createdUser = UserService.createUser(user);
 
         // Build the URI for the 'Location' header
-        URI location = URI.create("/api/users/" + createdUser.getUser_id());
+        URI location = URI.create("/api/users/" + createdUser.getUserid());
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.created(location).body(createdUser));
     }
@@ -50,6 +50,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(user)); // 200 OK
         } else {
             // Let the GlobalExceptionHandler handle this for a clean 404 response
+            //throw new ResourceNotFoundException("User not found with ID: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + id));
         }
     }
@@ -68,11 +69,12 @@ public class UserController {
     /**
      * Updates an existing user. The user's ID must be included in the request body.
      * Returns 200 OK with the confirmation message.
+     * Consider throwing ResourceNotFoundException if user.getId() is for a non-existent user.
      */
     @PutMapping
     public ResponseEntity<?> updateUser(@RequestBody User user) throws ExecutionException, InterruptedException {
         // Check if the user ID is provided in the request body
-        if (user.getUser_id() == null || user.getUser_id().isEmpty()) {
+        if (user.getUserid() == null || user.getUserid().isEmpty()) {
             // You might want a more specific response, like a 400 Bad Request
             //throw new IllegalArgumentException("User ID must be provided for an update.");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User ID must be provided for an update.");
@@ -85,7 +87,8 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(user));
         } else {
             // Let the GlobalExceptionHandler handle this for a clean 404 response
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + user.getUser_id()));
+            //throw new ResourceNotFoundException("Cannot update. User not found with ID: " + user.getUserid());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + user.getUserid()));
         }
 
     }
@@ -102,6 +105,7 @@ public class UserController {
         } else {
             // Throw our custom exception if the user was not found.
             // The GlobalExceptionHandler will turn this into a 404 Not Found.
+            //throw new ResourceNotFoundException("Cannot delete. User not found with ID: " + id);
             //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot delete. User not found with ID: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Cannot delete. User not found with ID: " + id));
 
