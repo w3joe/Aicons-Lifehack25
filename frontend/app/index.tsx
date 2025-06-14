@@ -22,6 +22,7 @@ export default function Home() {
       await AsyncStorage.removeItem('userToken');
       setIsLoggedIn(false);
       Alert.alert('Logged out');
+      router.push('/login');
     } else {
       router.push('/login');
     }
@@ -43,21 +44,24 @@ export default function Home() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <View style={styles.topBar}>
       <Text style={styles.header}>LEETFUTURE</Text>
 
       <TouchableOpacity
-        style={{ backgroundColor: '#007AFF', padding: 12, borderRadius: 8, marginBottom: 20 }}
+        style={styles.loginButton}
         onPress={handleLoginLogout}
       >
         <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
           {isLoggedIn ? 'Logout' : 'Login'}
         </Text>
       </TouchableOpacity>
+      </View>
+
 
       <View style={styles.titlecard}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>📚 Courses</Text>
-          <Text style={styles.seeMore} onPress={handleSeeMore}>See More</Text>
+          <Text style={styles.clickablelink} onPress={handleSeeMore}>See More</Text>
         </View>
 
         {courses.map((course) => (
@@ -75,19 +79,15 @@ export default function Home() {
       </View>
 
       <View style={styles.titlecard}>
-        <Text style={styles.sectionTitle}>📊 Quizzes</Text>
-      </View>
-
-      <View style={styles.titlecard}>
-        <Text style={styles.sectionTitle}>📥 Offline Downloads</Text>
+        <Text style={styles.sectionTitle}>📥 Saved Courses</Text>
       </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  header: { fontSize: 30, fontWeight: 'bold', marginBottom: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: 'lightblue'},
+  header: { fontSize: 30, fontWeight: 'bold', marginBottom: 20, marginTop: 20},
   sectionTitle: { fontSize: 24, fontWeight: 'bold', marginBottom: 20, marginTop: 10 },
 
   sectionHeader: {
@@ -119,6 +119,21 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 
+  topBar: {
+  flexDirection: 'row',
+  justifyContent: 'space-between', // puts space between header and button
+  alignItems: 'center',            // vertical center
+  marginBottom: 20,
+  marginTop: 20,
+  },
+
+  loginButton : {
+  backgroundColor: '#007AFF', 
+  padding: 12, 
+  borderRadius: 8,
+   marginBottom: 20
+  },
+
   cardTitle: {
     fontSize: 18,
     fontWeight: 'bold',
@@ -130,7 +145,7 @@ const styles = StyleSheet.create({
     color: '#555',
   },
 
-  seeMore: {
+  clickablelink: {
     fontSize: 16,
     color: '#007bff',
     fontWeight: '500',
