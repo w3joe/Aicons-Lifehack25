@@ -3,10 +3,14 @@ package aicon.lifehack.central_learning.controller;
 import aicon.lifehack.central_learning.model.User;
 import aicon.lifehack.central_learning.service.UserService;
 import aicon.lifehack.central_learning.dto.UpdateUserDTO;
+import aicon.lifehack.central_learning.model.Course; 
+import aicon.lifehack.central_learning.service.CourseService; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.*;
+
+import com.google.firebase.internal.FirebaseService;
 
 import java.net.URI;
 import java.util.List;
@@ -17,9 +21,11 @@ import java.util.concurrent.ExecutionException;
 public class UserController {
 
     private final UserService UserService;
+    private final CourseService courseService;
 
-    public UserController(UserService UserService) {
+   public UserController(UserService UserService, CourseService courseService) {
         this.UserService = UserService;
+        this.courseService = courseService;
     }
 
     /**
@@ -49,8 +55,6 @@ public class UserController {
         if (user != null) {
             return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(user)); // 200 OK
         } else {
-            // Let the GlobalExceptionHandler handle this for a clean 404 response
-            //throw new ResourceNotFoundException("User not found with ID: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + id));
         }
     }
@@ -65,6 +69,22 @@ public class UserController {
         //return ResponseEntity.ok(userList); // 200 OK
         return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(userList)); // 200 OK
     }
+
+    // --- GET ALL COURSES LIKED BY A USER ---
+    @GetMapping("/{userId}/liked-courses")
+    public ResponseEntity<?> getLikedCourses(@PathVariable String userId) 
+            throws ExecutionException, InterruptedException {
+
+        User user = UserService.getUser(userId);
+        if (user != null) {
+            List<Course> likedCourses = courseService.getLikedCoursesByUser(userId);
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(likedCourses)); // 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("User not found with ID: " + userId));
+        }
+        
+    }
+
 
     /**
      * Updates an existing user. The user's ID must be included in the request body.

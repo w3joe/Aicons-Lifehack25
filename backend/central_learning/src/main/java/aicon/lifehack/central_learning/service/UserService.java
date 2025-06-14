@@ -60,20 +60,6 @@ public class UserService {
         return user;
     }
 
-    public boolean updateUser(User user) throws ExecutionException, InterruptedException {
-        DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(user.getUser_id());
-        DocumentSnapshot document = docRef.get().get();
-
-        if (document.exists()) {
-            // Be careful about what fields you allow to be updated.
-            // For example, you probably don't want to change 'createdAt'.
-            // A more advanced implementation would use a DTO (Data Transfer Object) here.
-            docRef.set(user, SetOptions.merge()); // Use merge to avoid overwriting createdAt if not provided
-            return true;
-        } else {
-            return false;
-        }
-    }
     public User updateUser(String userId, UpdateUserDTO updateUserDTO) throws ExecutionException, InterruptedException {
     // 1. Get a reference to the document
     DocumentReference docRef = firestore.collection(COLLECTION_NAME).document(userId);
