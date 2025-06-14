@@ -1,13 +1,14 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Missing fields', 'Please enter both email and password.');
       return;
@@ -15,6 +16,7 @@ export default function LoginScreen() {
 
     // TODO: Add real authentication logic here
     if (email === 'test@gmail.com' && password === 'password') {
+      await AsyncStorage.setItem('userToken', 'mock-token'); // Store token
       Alert.alert('Login Successful');
       router.replace('/'); // Navigate to home screen
     } else {
@@ -24,6 +26,9 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>← Back to Home</Text>
+      </TouchableOpacity>
       <Text style={styles.title}>Login</Text>
 
       <TextInput
@@ -59,4 +64,18 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     fontSize: 16,
   },
+  
+  backButton: {
+  marginBottom: 10,
+  alignSelf: 'flex-start',
+  backgroundColor: '#007AFF',
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 8,
+},
+
+backButtonText: {
+  color: '#fff',
+  fontWeight: '500',
+},
 });

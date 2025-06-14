@@ -18,6 +18,10 @@ export default function CoursesScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>← Back to Home</Text>
+      </TouchableOpacity>
+
       <Text style={styles.header}>All Courses</Text>
 
       {courses.map((course) => (
@@ -68,4 +72,18 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#444',
   },
+  
+  backButton: {
+  marginBottom: 10,
+  alignSelf: 'flex-start',
+  backgroundColor: '#007AFF',
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  borderRadius: 8,
+},
+
+backButtonText: {
+  color: '#fff',
+  fontWeight: '500',
+},
 });

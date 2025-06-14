@@ -1,9 +1,31 @@
 import { useRouter } from 'expo-router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home() {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check login status on load
+  useEffect(() => {
+    const checkLoginStatus = async () => {
+      const token = await AsyncStorage.getItem('userToken');
+      setIsLoggedIn(!!token);
+    };
+    checkLoginStatus(); // to call the function upon startup
+  }, []); // [] means it does not run again unless page refreshed
+
+  // Handle Login/Logout button
+  const handleLoginLogout = async () => {
+    if (isLoggedIn) {
+      await AsyncStorage.removeItem('userToken');
+      setIsLoggedIn(false);
+      Alert.alert('Logged out');
+    } else {
+      router.push('/login');
+    }
+  };
 
   const courses = [
     { id: 1, name: 'Course 1', author: 'Alice', date: '2025-06-12' },
@@ -24,12 +46,13 @@ export default function Home() {
       <Text style={styles.header}>LEETFUTURE</Text>
 
       <TouchableOpacity
-      style={{ backgroundColor: '#007AFF', padding: 12, borderRadius: 8, marginBottom: 20 }}
-      onPress={() => router.push('/login')}
+        style={{ backgroundColor: '#007AFF', padding: 12, borderRadius: 8, marginBottom: 20 }}
+        onPress={handleLoginLogout}
       >
-        <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>Login</Text>
-    </TouchableOpacity>
-
+        <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
+          {isLoggedIn ? 'Logout' : 'Login'}
+        </Text>
+      </TouchableOpacity>
 
       <View style={styles.titlecard}>
         <View style={styles.sectionHeader}>
