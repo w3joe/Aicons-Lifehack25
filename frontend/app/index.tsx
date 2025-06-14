@@ -71,23 +71,22 @@ export default function Home() {
 
       <View style={styles.titlecard}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>📚 Courses</Text>
+          <Text style={styles.sectionTitle}>📚 Top Courses</Text>
           <Text style={styles.clickablelink} onPress={handleSeeMore}>
             See More
           </Text>
         </View>
 
         {courses.map((course) => (
-          <TouchableOpacity
+          <View
             key={course.id}
             style={styles.subcard}
-            activeOpacity={0.8}
-            onPress={() => handleTopicPress(course.name)}
           >
             <Text style={styles.cardTitle}>{course.name}</Text>
             <Text style={styles.cardDetail}>By {course.author}</Text>
             <Text style={styles.cardDetail}>Created on {course.date}</Text>
-          </TouchableOpacity>
+            
+          </View>
         ))}
       </View>
 

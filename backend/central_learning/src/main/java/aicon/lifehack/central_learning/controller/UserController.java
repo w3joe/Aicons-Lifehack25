@@ -41,7 +41,10 @@ public class UserController {
         // Build the URI for the 'Location' header
         URI location = URI.create("/api/users/" + createdUser.getUser_id());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.created(location).body(createdUser));
+        // this line returns 400 bad request and 201 created after which kinda screwed up the login as it had to get reponse code of 201 but got 400 first
+        //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.created(location).body(createdUser)); 
+
+        return ResponseEntity.created(location).body(createdUser);
     }
 
     /**

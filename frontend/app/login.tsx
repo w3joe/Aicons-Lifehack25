@@ -2,11 +2,18 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../api/api'; // adjust path as needed
+import { Platform } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Change depending on platform
+  const API_BASE = Platform.OS === 'android'
+    ? 'http://10.0.2.2:8080/api' // Android emulator
+    : 'http://localhost:8080/api'; // iOS simulator or web
 
   const handleRegister = () => {
     router.push("/register"); // Navigate to register page
@@ -18,13 +25,28 @@ export default function LoginScreen() {
       return;
     }
 
-    // TODO: Add real authentication logic here
+    /* TODO: Add real authentication logic here
     if (email === 'test@gmail.com' && password === 'password') {
       await AsyncStorage.setItem('userToken', 'mock-token'); // Store token
       Alert.alert('Login Successful');
       router.replace('/'); // Navigate to home screen
     } else {
       Alert.alert('Login Failed', 'Incorrect email or password.');
+    } */
+
+    try {
+      const response = await api.post('http://localhost:8080/api/auth/login', {
+        email,
+        password,
+      });
+
+      const token = response.data.token;
+      await AsyncStorage.setItem('userToken', token);
+      Alert.alert('Login Successful');
+      router.replace('/'); // navigate to home
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Invalid email or password';
+      Alert.alert('Login Failed', errorMessage);
     }
   };
 

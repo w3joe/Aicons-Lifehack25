@@ -2,9 +2,11 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../api/api'; // adjust path as needed
 
 export default function RegisterScreen() {
     const router = useRouter();
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -16,10 +18,25 @@ export default function RegisterScreen() {
 
     // TODO: Add real authentication logic here
     else { 
-        Alert.alert('Register Successful');
-        router.replace('/'); // Navigate to home screen
+        try {
+      const response = await api.post('http://localhost:8080/api/users', {
+        username,
+        email,
+        password,
+      });
+
+      if (response.status === 201) {
+      Alert.alert('Registration Successful', 'Please login to continue.');
+      router.push('/login'); // navigate to login page
+    } else {
+      Alert.alert('Registration Failed', 'Unexpected server response.');
     }
+  } catch (error: any) {
+    const message = error.response?.data?.message || 'Registration failed';
+    Alert.alert('Register Failed', message);
+  }
   };
+}
 
     return (
         <View style={styles.container}>
@@ -29,7 +46,16 @@ export default function RegisterScreen() {
         
               <View style={styles.titlecard}>
                 <Text style={styles.appTitle}>First Time?</Text>
-        
+
+              <TextInput
+                style={styles.input}
+                placeholder="Username"
+                value={username}
+                autoCapitalize="none"
+                keyboardType="default"
+                onChangeText={setUsername}
+              />
+
               <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -48,7 +74,7 @@ export default function RegisterScreen() {
               />
         
               <TouchableOpacity style={styles.loginButton} onPress={handleLogin} >
-                <Text style={styles.backButtonText}>Login</Text>
+                <Text style={styles.backButtonText}>Register</Text>
               </TouchableOpacity>
               </View>
             </View>
