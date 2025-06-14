@@ -117,10 +117,6 @@ public class UserController {
             // Return 200 if succeed
             return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body("User " + id + " is deleted"));
         } else {
-            // Throw our custom exception if the user was not found.
-            // The GlobalExceptionHandler will turn this into a 404 Not Found.
-            //throw new ResourceNotFoundException("Cannot delete. User not found with ID: " + id);
-            //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot delete. User not found with ID: " + id);
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Cannot delete. User not found with ID: " + id));
 
         }
