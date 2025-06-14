@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.*;
-import java.util.Map;
+import aicon.lifehack.central_learning.dto.CourseDetailsDTO;
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
 import java.util.List; 
@@ -39,6 +39,20 @@ public class CourseController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Course not found with ID: " + courseId));
 
+        }
+    }
+
+    // --- GET A SINGLE COURSE WITH ITS LESSONS ---
+    @GetMapping("/{courseId}/details")
+    public ResponseEntity<?> getCourseWithLessons(@PathVariable String courseId) 
+            throws ExecutionException, InterruptedException {
+        
+        CourseDetailsDTO courseDetails = courseService.getCourseWithLessons(courseId);
+        
+        if (courseDetails != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(courseDetails)); // 200 OK
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Course not found with ID: " + courseId));
         }
     }
     

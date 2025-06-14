@@ -3,6 +3,8 @@ package aicon.lifehack.central_learning.service;
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.model.CourseLike;
 import aicon.lifehack.central_learning.model.Lesson;
+import aicon.lifehack.central_learning.dto.CourseDetailsDTO; 
+import aicon.lifehack.central_learning.model.Lesson; 
 
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
@@ -12,7 +14,6 @@ import com.google.cloud.firestore.Firestore;
 import com.google.cloud.firestore.QuerySnapshot;
 import com.google.cloud.firestore.WriteBatch;
 import com.google.common.collect.Lists; 
-import com.google.cloud.firestore.Query; 
 import org.springframework.stereotype.Service;
 import com.google.cloud.firestore.FieldValue;
 import java.util.Date; 
@@ -67,8 +68,33 @@ public class CourseService {
         return courseList;
     }
 
+    // --- GET COURSE WITH ALL ITS LESSONS ---
+    public CourseDetailsDTO getCourseWithLessons(String courseId) throws ExecutionException, InterruptedException {
+        //Fetch the main course document
+        Course course = getCourse(courseId);
+
+        if (course == null) {
+            return null; // Course not found
+        }
+        
+        //Fetch all lessons associated with this course
+        List<Lesson> lessons = lessonService.getLessonsByCourse(courseId);
+        
+        // 3. Assemble the DTO
+        CourseDetailsDTO courseDetails = new CourseDetailsDTO();
+        courseDetails.setCourse_id(course.getCourse_id());
+        courseDetails.setTopic_id(course.getTopic_id());
+        courseDetails.setTitle(course.getTitle());
+        courseDetails.setDescription(course.getDescription());
+        courseDetails.setLike_count(course.getLike_count());
+        courseDetails.setLessons(lessons); // Add the list of lessons
+        
+        return courseDetails;
+    }
+
+
     public List<Course> getLikedCoursesByUser(String userId) throws ExecutionException, InterruptedException {
-        // 1. Find all 'like' documents for the given user.
+        //Find all 'like' documents for the given user.
         QuerySnapshot likesSnapshot = firestore.collection("course_likes")
                 .whereEqualTo("user_id", userId)
                 .get()
@@ -78,13 +104,13 @@ public class CourseService {
             return new ArrayList<>(); // Return an empty list if the user has liked nothing.
         }
 
-        // 2. Extract all the 'course_id's from the like documents.
+        //Extract all the 'course_id's from the like documents.
         List<String> likedCourseIds = new ArrayList<>();
         likesSnapshot.getDocuments().forEach(doc -> {
             likedCourseIds.add(doc.getString("course_id"));
         });
 
-        // 3. Fetch all course documents corresponding to the extracted IDs.
+        //Fetch all course documents corresponding to the extracted IDs.
         // Firestore's 'in' query is limited to 30 items per query.
         // If a user can like more than 30 courses, we need to partition the list.
         List<Course> likedCourses = new ArrayList<>();
