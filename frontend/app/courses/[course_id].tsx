@@ -1,10 +1,17 @@
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import { useRouter } from "expo-router";
 
 import { Ionicons } from "@expo/vector-icons";
 
 export default function CourseDetailScreen(topic:string) {
+  const router = useRouter();
+
+  const handleBackPress = () => {
+    router.back();
+  };
+
   // Dummy course data
   const course = {
     id: "1",
@@ -34,7 +41,7 @@ export default function CourseDetailScreen(topic:string) {
     <ScrollView style={styles.container}>
       {/* Header with back button */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={() => handleBackPress()}>
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Course Details</Text>
