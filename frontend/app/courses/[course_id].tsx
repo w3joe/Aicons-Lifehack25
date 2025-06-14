@@ -13,7 +13,7 @@ export default function CourseDetailScreen(topic:string) {
     description:
       "Learn how to build mobile apps with React Native. This course covers the fundamentals and advanced topics to get you started with cross-platform mobile development.",
     duration: "8 weeks",
-    level: "Beginner",
+    topic: "Beginner",
     rating: 4.7,
     students: 1250,
     lessons: [
@@ -60,7 +60,7 @@ export default function CourseDetailScreen(topic:string) {
 
         <View style={styles.detailsRow}>
           <Text style={styles.detailItem}>{course.duration}</Text>
-          <Text style={styles.detailItem}>{course.level}</Text>
+          <Text style={styles.detailItem}>{course.topic}</Text>
         </View>
 
         <Text style={styles.sectionTitle}>About this course</Text>

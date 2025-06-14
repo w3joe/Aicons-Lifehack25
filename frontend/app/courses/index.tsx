@@ -1,24 +1,45 @@
-import { useRouter } from 'expo-router';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from 'react-native';
+import { useRouter } from "expo-router";
+import React from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
 
 export default function CoursesScreen() {
   const router = useRouter();
 
   const courses = [
-    { course_id: 1, name: 'Course 1', author: 'Alice', date: '2025-06-12', description: 'Detailed overview of Course 1' },
-    { course_id: 2, name: 'Course 2', author: 'Bob', date: '2025-05-20', description: 'Master the basics of Course 2' },
-    { course_id: 3, name: 'Course 3', author: 'Carol', date: '2025-04-15', description: 'In-depth learning with Course 3' },
+    {
+      course_id: "wKAhSj4WfztLoyswTVGE",
+      name: "Course 1",
+      author: "Alice",
+      date: "2025-06-12",
+      description: "Detailed overview of Course 1",
+    },
+    {
+      course_id: "wKAhSweWfztLoysw5VGE",
+      name: "Course 2",
+      author: "Bob",
+      date: "2025-05-20",
+      description: "Master the basics of Course 2",
+    },
+    {
+      course_id: "wKAhSj4WfziwoyswTVuE",
+      name: "Course 3",
+      author: "Carol",
+      date: "2025-04-15",
+      description: "In-depth learning with Course 3",
+    },
   ];
 
-  const handleCoursePress = (course_id: string) => {
-    alert(`You selected ${course_id}`);
+  const handleCoursePress = (name: string) => {
     // Optionally: router.push(`/courses/${id}`) if you later create dynamic pages
-    router.push(`/courses/${course_id}`)
+    var url: string = name.replace(/ /g, "_").toLowerCase();
+    router.push(`/courses/${url}`);
   };
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{ paddingBottom: 40 }}
+    >
       <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Back to Home</Text>
       </TouchableOpacity>
@@ -33,7 +54,9 @@ export default function CoursesScreen() {
           onPress={() => handleCoursePress(course.name)}
         >
           <Text style={styles.courseTitle}>{course.name}</Text>
-          <Text style={styles.courseMeta}>By {course.author} | {course.date}</Text>
+          <Text style={styles.courseMeta}>
+            By {course.author} | {course.date}
+          </Text>
           <Text style={styles.courseDescription}>{course.description}</Text>
         </TouchableOpacity>
       ))}
@@ -42,15 +65,15 @@ export default function CoursesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: 'lightblue' },
-  header: { fontSize: 28, fontWeight: 'bold', marginBottom: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: "lightblue" },
+  header: { fontSize: 28, fontWeight: "bold", marginBottom: 20 },
 
   courseCard: {
-    backgroundColor: '#f9f9f9',
+    backgroundColor: "#f9f9f9",
     padding: 20,
     marginBottom: 16,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
     shadowOffset: { width: 0, height: 2 },
@@ -59,33 +82,33 @@ const styles = StyleSheet.create({
 
   courseTitle: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
 
   courseMeta: {
     fontSize: 13,
-    color: '#888',
+    color: "#888",
     marginBottom: 8,
   },
 
   courseDescription: {
     fontSize: 15,
-    color: '#444',
+    color: "#444",
   },
-  
-  backButton: {
-  marginBottom: 10,
-  marginTop: 20,
-  alignSelf: 'flex-start',
-  backgroundColor: '#007AFF',
-  paddingVertical: 6,
-  paddingHorizontal: 12,
-  borderRadius: 8,
-},
 
-backButtonText: {
-  color: '#fff',
-  fontWeight: '500',
-},
+  backButton: {
+    marginBottom: 10,
+    marginTop: 20,
+    alignSelf: "flex-start",
+    backgroundColor: "#007AFF",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+
+  backButtonText: {
+    color: "#fff",
+    fontWeight: "500",
+  },
 });
