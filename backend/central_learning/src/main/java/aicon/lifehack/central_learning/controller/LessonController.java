@@ -2,6 +2,9 @@ package aicon.lifehack.central_learning.controller;
 
 import aicon.lifehack.central_learning.model.Lesson;
 import aicon.lifehack.central_learning.service.LessonService;
+import aicon.lifehack.central_learning.model.Resource; 
+import aicon.lifehack.central_learning.service.ResourceService; 
+import java.util.List; 
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +19,11 @@ import java.util.concurrent.ExecutionException;
 public class LessonController {
 
     private final LessonService lessonService;
+    private final ResourceService resourceService;
 
-    public LessonController(LessonService lessonService) {
+    public LessonController(LessonService lessonService, ResourceService resourceService) {
         this.lessonService = lessonService;
+        this.resourceService = resourceService;
     }
 
     @PostMapping
@@ -37,6 +42,14 @@ public class LessonController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Lesson not found with ID: " + lessonId));
         }
     }
+
+    @GetMapping("/{lessonId}/resources")
+    public ResponseEntity<List<Resource>> getResourcesForLesson(@PathVariable String lessonId) 
+            throws ExecutionException, InterruptedException {
+        List<Resource> resources = resourceService.getResourcesByLesson(lessonId);
+        return ResponseEntity.ok(resources);
+    }
+
     
     @PutMapping("/{lessonId}")
     public ResponseEntity<?> updateLesson(@PathVariable String lessonId, @RequestBody Lesson lesson) throws ExecutionException, InterruptedException {
