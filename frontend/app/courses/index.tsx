@@ -6,14 +6,15 @@ export default function CoursesScreen() {
   const router = useRouter();
 
   const courses = [
-    { id: 1, name: 'Course 1', author: 'Alice', date: '2025-06-12', description: 'Detailed overview of Course 1' },
-    { id: 2, name: 'Course 2', author: 'Bob', date: '2025-05-20', description: 'Master the basics of Course 2' },
-    { id: 3, name: 'Course 3', author: 'Carol', date: '2025-04-15', description: 'In-depth learning with Course 3' },
+    { course_id: 1, name: 'Course 1', author: 'Alice', date: '2025-06-12', description: 'Detailed overview of Course 1' },
+    { course_id: 2, name: 'Course 2', author: 'Bob', date: '2025-05-20', description: 'Master the basics of Course 2' },
+    { course_id: 3, name: 'Course 3', author: 'Carol', date: '2025-04-15', description: 'In-depth learning with Course 3' },
   ];
 
-  const handleCoursePress = (courseName: string) => {
-    alert(`You selected ${courseName}`);
+  const handleCoursePress = (course_id: string) => {
+    alert(`You selected ${course_id}`);
     // Optionally: router.push(`/courses/${id}`) if you later create dynamic pages
+    router.push(`/courses/${course_id}`)
   };
 
   return (
@@ -26,7 +27,7 @@ export default function CoursesScreen() {
 
       {courses.map((course) => (
         <TouchableOpacity
-          key={course.id}
+          key={course.course_id}
           style={styles.courseCard}
           activeOpacity={0.9}
           onPress={() => handleCoursePress(course.name)}
