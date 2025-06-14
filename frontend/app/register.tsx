@@ -3,14 +3,10 @@ import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function LoginScreen() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const handleRegister = () => {
-    router.push("/register"); // Navigate to register page
-  };
+export default function RegisterScreen() {
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -19,49 +15,44 @@ export default function LoginScreen() {
     }
 
     // TODO: Add real authentication logic here
-    if (email === 'test@gmail.com' && password === 'password') {
-      await AsyncStorage.setItem('userToken', 'mock-token'); // Store token
-      Alert.alert('Login Successful');
-      router.replace('/'); // Navigate to home screen
-    } else {
-      Alert.alert('Login Failed', 'Incorrect email or password.');
+    else { 
+        Alert.alert('Register Successful');
+        router.replace('/'); // Navigate to home screen
     }
   };
 
-  return (
-    <View style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>← Back to Home</Text>
-      </TouchableOpacity>
-
-      <View style={styles.titlecard}>
-        <Text style={styles.appTitle}>LEETFUTURE</Text>
-
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        onChangeText={setEmail}
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        secureTextEntry
-        onChangeText={setPassword}
-      />
-      
-      <Text style={styles.clickablelink} onPress={handleRegister}>New Here?</Text>
-
-      <TouchableOpacity style={styles.loginButton} onPress={handleLogin} >
-        <Text style={styles.backButtonText}>Login</Text>
-      </TouchableOpacity>
-      </View>
-    </View>
-  );
+    return (
+        <View style={styles.container}>
+              <TouchableOpacity onPress={() => router.replace('/')} style={styles.backButton}>
+                <Text style={styles.backButtonText}>← Back to Home</Text>
+              </TouchableOpacity>
+        
+              <View style={styles.titlecard}>
+                <Text style={styles.appTitle}>First Time?</Text>
+        
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                value={email}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+              />
+        
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                value={password}
+                secureTextEntry
+                onChangeText={setPassword}
+              />
+        
+              <TouchableOpacity style={styles.loginButton} onPress={handleLogin} >
+                <Text style={styles.backButtonText}>Login</Text>
+              </TouchableOpacity>
+              </View>
+            </View>
+    );
 }
 
 const styles = StyleSheet.create({
