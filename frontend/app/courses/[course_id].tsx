@@ -32,7 +32,7 @@ export default function CourseDetailScreen(course_id: string) {
   if (!course) return <Text>Loading...</Text>;
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.container} stickyHeaderIndices={[0]}>
       {/* Header with back button */}
       <View style={styles.header}>
         <TouchableOpacity
@@ -46,7 +46,12 @@ export default function CourseDetailScreen(course_id: string) {
       </View>
 
       {/* Course thumbnail */}
-      {/* <Image source={{ uri: course.thumbnail }} style={styles.thumbnail} /> */}
+      <Image
+        source={{
+          uri: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+        }}
+        style={styles.thumbnail}
+      />
 
       {/* Course details */}
       <View style={styles.content}>
@@ -55,7 +60,7 @@ export default function CourseDetailScreen(course_id: string) {
         <View style={styles.metaContainer}>
           {/* <Text style={styles.instructor}>By {course.instructor}</Text> */}
           <View style={styles.ratingContainer}>
-            <Ionicons name="star" size={16} color="#FFD700" />
+            <Ionicons name="thumbs-up-sharp" size={16} color="#FFD700" />
             <Text style={styles.ratingText}>{course.like_count}</Text>
           </View>
         </View>
@@ -101,6 +106,7 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
+    backgroundColor: "#fff",
   },
   backButton: {
     padding: 4,
