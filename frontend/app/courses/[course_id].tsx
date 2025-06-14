@@ -3,6 +3,7 @@ import { StyleSheet } from "react-native";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { getCourseById } from "@/services/courseService";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "expo-router";
 
 import { Ionicons } from "@expo/vector-icons";
 import { Course } from "@/models/Course";
@@ -22,13 +23,22 @@ export default function CourseDetailScreen(course_id: string) {
     })();
   }, ["7DrKhURbwdILpTbAwIQf"]);
 
+  const router = useRouter();
+
+  const handleBackPress = () => {
+    router.back();
+  };
+
   if (!course) return <Text>Loading...</Text>;
 
   return (
     <ScrollView style={styles.container}>
       {/* Header with back button */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => handleBackPress()}
+        >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Course Details</Text>

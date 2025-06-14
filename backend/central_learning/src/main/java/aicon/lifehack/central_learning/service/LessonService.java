@@ -51,6 +51,8 @@ public class LessonService {
         if (docRef.get().get().exists()) {
             // Selectively update fields
             docRef.update("title", lesson.getTitle());
+            docRef.update("time_taken", lesson.getTime_taken());
+
             return docRef.get().get().toObject(Lesson.class);
         }
         return null;
