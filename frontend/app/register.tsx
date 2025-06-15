@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../api/api'; // adjust path as needed
 
@@ -10,9 +10,17 @@ export default function RegisterScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const showAlert = (title: string, message: string) => {
+        if (Platform.OS === 'web') {
+          alert(`${title}: ${message}`);
+        } else {
+          Alert.alert(title, message);
+        }
+      };
+
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Missing fields', 'Please enter both email and password.');
+      showAlert('Missing fields', 'Please enter both email and password.');
       return;
     }
 
@@ -26,14 +34,14 @@ export default function RegisterScreen() {
       });
 
       if (response.status === 201) {
-      Alert.alert('Registration Successful', 'Please login to continue.');
+      showAlert('Registration Successful', 'Please login to continue.');
       router.push('/login'); // navigate to login page
     } else {
-      Alert.alert('Registration Failed', 'Unexpected server response.');
+      showAlert('Registration Failed', 'Unexpected server response.');
     }
   } catch (error: any) {
     const message = error.response?.data?.message || 'Registration failed';
-    Alert.alert('Register Failed', message);
+    showAlert('Register Failed', message);
   }
   };
 }

@@ -15,13 +15,21 @@ export default function LoginScreen() {
     ? 'http://10.0.2.2:8080/api' // Android emulator
     : 'http://localhost:8080/api'; // iOS simulator or web
 
+  const showAlert = (title: string, message: string) => {
+    if (Platform.OS === 'web') {
+      alert(`${title}: ${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
+
   const handleRegister = () => {
     router.push("/register"); // Navigate to register page
   };
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert('Missing fields', 'Please enter both email and password.');
+      showAlert('Missing fields', 'Please enter both email and password.');
       return;
     }
 
@@ -42,11 +50,11 @@ export default function LoginScreen() {
 
       const token = response.data.token;
       await AsyncStorage.setItem('userToken', token);
-      Alert.alert('Login Successful');
+      showAlert('LEETFUTURE', 'Login Successful');
       router.replace('/'); // navigate to home
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Invalid email or password';
-      Alert.alert('Login Failed', errorMessage);
+      showAlert('LEETFUTURE', 'Login Failed: ' + errorMessage);
     }
   };
 
