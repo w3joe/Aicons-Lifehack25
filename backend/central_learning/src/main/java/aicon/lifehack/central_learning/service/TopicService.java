@@ -2,6 +2,8 @@ package aicon.lifehack.central_learning.service;
 
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.model.Topic;
+import aicon.lifehack.central_learning.model.User;
+
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -63,13 +65,19 @@ public class TopicService {
         DocumentSnapshot document = docRef.get().get();
         
         if (document.exists()) {
-            // Update the existing document with new values
-            docRef.update("name", topic.getName());
-            docRef.update("description", topic.getDescription());
-            
+        Topic existingTopic = document.toObject(Topic.class);
+        
+        // 4. Selectively update the fields from the DTO
+        if (topic.getName() != null) {
+            existingTopic.setName(topic.getName());
+        }
+        if (topic.getDescription() != null) {
+            existingTopic.setDescription(topic.getDescription());
+        }            
             // Set the ID from the path to return the full object
-            topic.setTopic_id(topicId); 
-            return topic;
+            docRef.set(existingTopic).get();
+            return existingTopic;
+
         } else {
             return null;
         }

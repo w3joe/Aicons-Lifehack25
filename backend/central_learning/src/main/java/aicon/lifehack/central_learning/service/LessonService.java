@@ -1,6 +1,8 @@
 package aicon.lifehack.central_learning.service;
 import aicon.lifehack.central_learning.model.Resource;
 import aicon.lifehack.central_learning.model.Lesson;
+import aicon.lifehack.central_learning.model.Question;
+
 import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;
 
@@ -48,12 +50,18 @@ public class LessonService {
     
     public Lesson updateLesson(String lessonId, Lesson lesson) throws ExecutionException, InterruptedException {
         DocumentReference docRef = getLessonsCollection().document(lessonId);
-        if (docRef.get().get().exists()) {
-            // Selectively update fields
-            docRef.update("title", lesson.getTitle());
-            docRef.update("time_taken", lesson.getTime_taken());
+        DocumentSnapshot document = docRef.get().get();
 
-            return docRef.get().get().toObject(Lesson.class);
+        if (document.exists()) {
+            Lesson existingLesson = document.toObject(Lesson.class);
+            if (lesson.getTitle() != null) {
+                existingLesson.setTitle(lesson.getTitle());
+            }
+            if (lesson.getTime_taken() != null) {
+                existingLesson.setTime_taken(lesson.getTime_taken());
+            }
+        docRef.set(existingLesson).get();
+        return existingLesson;
         }
         return null;
     }

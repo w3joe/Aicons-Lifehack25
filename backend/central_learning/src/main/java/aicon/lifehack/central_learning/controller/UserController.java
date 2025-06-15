@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.*;
 
-import com.google.firebase.internal.FirebaseService;
-
 import java.net.URI;
 import java.util.List;
 import java.util.concurrent.ExecutionException;

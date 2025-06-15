@@ -1,6 +1,8 @@
 package aicon.lifehack.central_learning.service;
 
 import aicon.lifehack.central_learning.model.Resource;
+import aicon.lifehack.central_learning.model.Topic;
+
 import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;
 
@@ -46,10 +48,20 @@ public class ResourceService {
     
     public Resource updateResource(String resourceId, Resource resource) throws ExecutionException, InterruptedException {
         DocumentReference docRef = getResourcesCollection().document(resourceId);
-        if (docRef.get().get().exists()) {
-            docRef.update("title", resource.getTitle());
-            docRef.update("url_or_content", resource.getUrl_or_content());
-            return docRef.get().get().toObject(Resource.class);
+        DocumentSnapshot document = docRef.get().get();
+
+        if (document.exists()) {
+            Resource existingResource = document.toObject(Resource.class);
+        
+            // 4. Selectively update the fields from the DTO
+            if (resource.getTitle() != null) {
+                existingResource.setTitle( resource.getTitle());
+            }            
+            if (resource.getUrl_or_content() != null) {
+                existingResource.setUrl_or_content(resource.getUrl_or_content());
+            }      
+            docRef.set(existingResource).get();
+            return existingResource;
         }
         return null;
     }

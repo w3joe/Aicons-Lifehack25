@@ -138,14 +138,18 @@ public class CourseService {
         DocumentSnapshot document = docRef.get().get();
         
         if (document.exists()) {
-            // Only update the title. Don't let users change the topic_id or course_id this way.
+            Course existingCourse = document.toObject(Course.class);
+
             docRef.update("title", course.getTitle());
             docRef.update("description", course.getDescription());
-
-
-            // Return the full updated object for the response
-            Course updatedCourse = docRef.get().get().toObject(Course.class);
-            return updatedCourse;
+            if (course.getTitle() != null) {
+                existingCourse.setTitle(course.getTitle());
+            }
+            if (course.getDescription() != null) {
+                existingCourse.setDescription(course.getDescription());
+            }
+        docRef.set(existingCourse).get();
+        return existingCourse;
         } else {
             return null;
         }
