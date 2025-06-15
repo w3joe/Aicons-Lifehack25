@@ -4,19 +4,21 @@ import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import { getCourseById } from "@/services/courseService";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-
+import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
 import { Course } from "@/models/Course";
 
 export default function CourseDetailScreen(course_id: string) {
   const [course, setCourse] = useState<Course | null>(null);
+  const [expandedLessonIndex, setExpandedLessonIndex] = useState<number | null>(
+    null
+  );
 
   useEffect(() => {
     (async () => {
       try {
         const data = await getCourseById("7DrKhURbwdILpTbAwIQf");
         setCourse(data.body);
-        console.log(data);
       } catch (err) {
         console.error(err);
       }
@@ -74,21 +76,45 @@ export default function CourseDetailScreen(course_id: string) {
 
         <Text style={styles.sectionTitle}>Curriculum</Text>
         {course?.lessons?.map((lesson, index) => (
-          <View key={lesson.lesson_id} style={styles.lessonItem}>
-            <View style={styles.lessonNumber}>
-              <Text style={styles.lessonNumberText}>{index + 1}</Text>
-            </View>
-            <View style={styles.lessonContent}>
-              <Text style={styles.lessonTitle}>{lesson.title}</Text>
-              <Text style={styles.lessonDuration}>{lesson.time_taken}</Text>
-            </View>
+          <View key={lesson.lesson_id} style={styles.lessonItemContainer}>
+            <TouchableOpacity
+              onPress={() =>
+                setExpandedLessonIndex(
+                  expandedLessonIndex === index ? null : index
+                )
+              }
+              style={styles.lessonItem}
+            >
+              <View style={styles.lessonNumber}>
+                <Text style={styles.lessonNumberText}>{index + 1}</Text>
+              </View>
+              <View style={styles.lessonContent}>
+                <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                <Text style={styles.lessonDuration}>{lesson.time_taken}</Text>
+              </View>
+            </TouchableOpacity>
+
+            {expandedLessonIndex === index && (
+              <View style={styles.expandedContent}>
+                <Video
+                  source={{
+                    uri: "https://youtu.be/0-S5a0eXPoc?si=GEUPmTmXt9sa4DFW",
+                  }}
+                  style={styles.video}
+                  controls
+                  resizeMode="contain"
+                />
+                <Text style={styles.courseDescription}>
+                  {lesson.time_taken} blah jkasdfjkahfk aflkdj ladjs f
+                </Text>
+                {/* Enroll button */}
+                <TouchableOpacity style={styles.enrollButton}>
+                  <Text style={styles.enrollButtonText}>Quiz Now</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
         ))}
-
-        {/* Enroll button */}
-        <TouchableOpacity style={styles.enrollButton}>
-          <Text style={styles.enrollButtonText}>Enroll Now</Text>
-        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -207,6 +233,29 @@ const styles = StyleSheet.create({
   lessonDuration: {
     fontSize: 13,
     color: "#888",
+  },
+  lessonItemContainer: {
+    marginBottom: 10,
+  },
+
+  expandedContent: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    padding: 10,
+    margin: 16,
+    elevation: 2,
+    marginTop: 5,
+    
+  },
+  courseDescription: {
+    fontSize: 14,
+    color: "#333",
+  },
+  video: {
+    width: "100%",
+    height: 250,
+    marginBottom: 12,
+    position: "relative"
   },
   enrollButton: {
     backgroundColor: "#1976d2",
