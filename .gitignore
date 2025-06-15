@@ -1,0 +1,6 @@
+backend/central_learning/target/classes/aicon/lifehack/central_learning/CentralLearningApplication.class
+backend/central_learning/target/classes/aicon/lifehack/central_learning/Firebase/FirebaseConfig.class
+backend/central_learning/target/classes/aicon/lifehack/central_learning/model/User.class
+backend/central_learning/target/classes/aicon/lifehack/central_learning/service/UserService.class
+backend/central_learning/target/classes/aicon/lifehack/central_learning/WelcomeTest.class
+backend/central_learning/target/test-classes/aicon/lifehack/central_learning/CentralLearningApplicationTests.class

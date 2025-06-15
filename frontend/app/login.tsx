@@ -2,11 +2,22 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../api/api'; // adjust path as needed
+import { Platform } from 'react-native';
 
 export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  // Change depending on platform
+  const API_BASE = Platform.OS === 'android'
+    ? 'http://10.0.2.2:8080/api' // Android emulator
+    : 'http://localhost:8080/api'; // iOS simulator or web
+
+  const handleRegister = () => {
+    router.push("/register"); // Navigate to register page
+  };
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -14,13 +25,28 @@ export default function LoginScreen() {
       return;
     }
 
-    // TODO: Add real authentication logic here
+    /* TODO: Add real authentication logic here
     if (email === 'test@gmail.com' && password === 'password') {
       await AsyncStorage.setItem('userToken', 'mock-token'); // Store token
       Alert.alert('Login Successful');
       router.replace('/'); // Navigate to home screen
     } else {
       Alert.alert('Login Failed', 'Incorrect email or password.');
+    } */
+
+    try {
+      const response = await api.post('http://localhost:8080/api/auth/login', {
+        email,
+        password,
+      });
+
+      const token = response.data.token;
+      await AsyncStorage.setItem('userToken', token);
+      Alert.alert('Login Successful');
+      router.replace('/'); // navigate to home
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Invalid email or password';
+      Alert.alert('Login Failed', errorMessage);
     }
   };
 
@@ -31,7 +57,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <View style={styles.titlecard}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.appTitle}>LEETFUTURE</Text>
 
       <TextInput
         style={styles.input}
@@ -49,6 +75,8 @@ export default function LoginScreen() {
         secureTextEntry
         onChangeText={setPassword}
       />
+      
+      <Text style={styles.clickablelink} onPress={handleRegister}>New Here?</Text>
 
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin} >
         <Text style={styles.backButtonText}>Login</Text>
@@ -60,6 +88,7 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: 'lightblue',},
+  appTitle: { fontSize: 36, fontWeight: 'bold', marginBottom: 50, textAlign: 'center' },
   title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
   background: {
     flex: 1,              // takes up the entire screen
@@ -118,5 +147,13 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     shadowOffset: { width: 0, height: 3 },
     elevation: 10,
+  },
+
+  clickablelink: {
+    fontSize: 16,
+    color: "#007bff",
+    fontWeight: "500",
+    marginBottom: 20,
+    marginLeft: 10,
   },
 });
