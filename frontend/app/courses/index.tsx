@@ -21,30 +21,6 @@ export default function CoursesScreen() {
     fetchAllCourses();
   }, []);
 
-  /*const courses = [
-    {
-      course_id: "wKAhSj4WfztLoyswTVGE",
-      name: "Course 1",
-      author: "Alice",
-      date: "2025-06-12",
-      description: "Detailed overview of Course 1",
-    },
-    {
-      course_id: "wKAhSweWfztLoysw5VGE",
-      name: "Course 2",
-      author: "Bob",
-      date: "2025-05-20",
-      description: "Master the basics of Course 2",
-    },
-    {
-      course_id: "wKAhSj4WfziwoyswTVuE",
-      name: "Course 3",
-      author: "Carol",
-      date: "2025-04-15",
-      description: "In-depth learning with Course 3",
-    },
-  ]; */
-
   // Alert wrapper for web and app
     const showAlert = (title: string, message: string) => {
       if (Platform.OS === "web") {
@@ -70,7 +46,8 @@ export default function CoursesScreen() {
       id: course.course_id,
       name: course.title,
       author: course.author,
-      date: course.date,
+      date: course.created_at,
+      description: course.description,
       topicId: course.topic_id,
     }));
     

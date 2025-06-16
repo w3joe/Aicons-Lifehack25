@@ -8,7 +8,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function CreateCourse() {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
-  const [date, setDate] = useState('');
   const [description, setDescription] = useState('');
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState('');
@@ -32,7 +31,7 @@ export default function CreateCourse() {
   }, []);
 
   const handleCreate = async () => {
-    if (!title || !author || !date) {
+    if (!title || !author) {
       showAlert('Error', 'All fields are required.');
       return;
     }
@@ -42,7 +41,6 @@ export default function CreateCourse() {
         topic_id: selectedTopic,
         title: title,
         author: author,
-        date: date,
         description: description,
       });
 
@@ -78,12 +76,6 @@ export default function CreateCourse() {
         placeholder="Author"
         value={author}
         onChangeText={setAuthor}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Date (MMM-YYYY)"
-        value={date}
-        onChangeText={setDate}
       />
       <TextInput
         style={styles.input}

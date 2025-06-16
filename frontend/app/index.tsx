@@ -82,7 +82,7 @@ export default function Home() {
       id: course.course_id,
       name: course.title,
       author: course.author,
-      date: course.date,
+      date: course.created_at,
       topicId: course.topic_id,
     }));
     
@@ -108,7 +108,7 @@ export default function Home() {
       id: course.course_id,
       name: course.title,
       author: course.author,
-      date: course.date,
+      date: course.created_at,
       topicId: course.topic_id,
     }));
     setCourses(normalizedCourses);
@@ -218,7 +218,7 @@ export default function Home() {
       </View>
 
       <View style={styles.titlecard}>
-        <Text style={styles.sectionTitle}>📥 Saved Courses</Text>
+        <Text style={styles.sectionTitle}>Contact Us</Text>
       </View>
     </ScrollView>
   );
