@@ -10,6 +10,7 @@ import {
   Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from '../api/api';
 
 export default function Home() {
   type Topic = {
@@ -48,8 +49,9 @@ export default function Home() {
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const response = await fetch("http://localhost:8080/api/topics");
-        const data = await response.json();
+        const response = await api.get("/topics");
+        //const data = await response.json();
+        const data = response.data;
         // Defensive: check if body is an array
         const topicsArray = Array.isArray(data.body) ? data.body : [];
         // Optional: map topic_id to id to keep consistent keys
@@ -72,8 +74,9 @@ export default function Home() {
 
   const fetchAllCourses = async () => {
   try {
-    const response = await fetch(`http://localhost:8080/api/courses`);
-    const data = await response.json();
+    const response = await api.get(`/courses`);
+    //const data = await response.json();
+    const data = response.data;
     const courseArray = Array.isArray(data.body) ? data.body : [];
     const normalizedCourses: Course[] = courseArray.map((course: any) => ({
       id: course.course_id,
@@ -97,8 +100,9 @@ export default function Home() {
 
   const fetchCoursesByTopic = async (topicId: string) => {
   try {
-    const response = await fetch(`http://localhost:8080/api/topics/${topicId}/courses`);
-    const data = await response.json();
+    const response = await api.get(`/topics/${topicId}/courses`);
+    //const data = await response.json();
+    const data = response.data;
     const courseArray = Array.isArray(data.body) ? data.body : [];
     const normalizedCourses: Course[] = courseArray.map((course: any) => ({
       id: course.course_id,
