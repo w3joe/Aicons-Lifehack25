@@ -10,4 +10,5 @@ public class ProgressRequestDTO {
     // This field will only be used for the update request,
     // it can be null for the 'get' request.
     private Difficulty new_difficulty;
+    private double proficiency_score; 
 }
