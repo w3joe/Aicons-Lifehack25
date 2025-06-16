@@ -78,7 +78,11 @@ export default function CourseDetailScreen(course_id: string) {
         <Text style={styles.description}>{course.description}</Text>
         <TouchableOpacity
           style={styles.quizButton}
-          onPress={() => router.push(`../courses/${course_id}/${course?.lessons?.at(0)?.lesson_id}`)}
+          onPress={() =>
+            router.push(
+              `../courses/${course_id}/${course?.lessons?.at(0)?.lesson_id}`
+            )
+          }
         >
           <Text style={styles.quizButtonText}>Resume</Text>
         </TouchableOpacity>
@@ -104,24 +108,11 @@ export default function CourseDetailScreen(course_id: string) {
 
             {expandedLessonIndex === index && (
               <View style={styles.expandedContent}>
-                <Video
-                  source={{
-                    uri: "https://youtu.be/0-S5a0eXPoc?si=GEUPmTmXt9sa4DFW",
-                  }}
-                  style={styles.video}
-                  controls
-                  resizeMode="contain"
-                />
                 <Text style={styles.courseDescription}>
-                  {lesson.time_taken} blah jkasdfjkahfk aflkdj ladjs f
+                  {lesson.description} blah blah alkajsdf adjsf klasdj flkajsd
+                  kl;f jasdkl;fj kl;asdj fkl;adjs klf jasdklf jaklsj fkladsj
+                  fkl;
                 </Text>
-                {/* Quiz button */}
-                <TouchableOpacity
-                  style={styles.quizButton}
-                  onPress={() => router.push(`../quizzes/${lesson.quiz_id}`)}
-                >
-                  <Text style={styles.quizButtonText}>Quiz Now</Text>
-                </TouchableOpacity>
               </View>
             )}
           </View>
@@ -266,12 +257,6 @@ const styles = StyleSheet.create({
   courseDescription: {
     fontSize: 14,
     color: "#333",
-  },
-  video: {
-    width: "100%",
-    height: 250,
-    marginBottom: 12,
-    position: "relative",
   },
   quizButton: {
     backgroundColor: "#1976d2",
