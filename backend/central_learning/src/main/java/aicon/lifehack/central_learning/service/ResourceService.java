@@ -1,8 +1,6 @@
 package aicon.lifehack.central_learning.service;
 
 import aicon.lifehack.central_learning.model.Resource;
-import aicon.lifehack.central_learning.model.Topic;
-
 import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;
 

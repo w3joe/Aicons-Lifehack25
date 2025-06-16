@@ -1,15 +1,14 @@
 package aicon.lifehack.central_learning.controller;
 
-import aicon.lifehack.central_learning.dto.ProgressRequestDTO; // Add this
+import aicon.lifehack.central_learning.dto.ProgressRequestDTO;
 import aicon.lifehack.central_learning.model.ProgressTracker;
 import aicon.lifehack.central_learning.service.ProgressTrackerService;
-
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.ExecutionException;
 
+//To allow for student to retake lessons
 @RestController
 @RequestMapping("/api/progress")
 public class ProgressTrackerController {
@@ -20,30 +19,23 @@ public class ProgressTrackerController {
         this.progressTrackerService = progressTrackerService;
     }
 
-    /**
-     * Gets (or creates) the progress for a user in a specific course.
-     * Uses POST to accept a JSON body.
-     */
-    @PostMapping("/status") // Changed to POST and added a path segment for clarity
+    @PostMapping("/status")
     public ResponseEntity<ProgressTracker> getProgress(@RequestBody ProgressRequestDTO request) 
             throws ExecutionException, InterruptedException {
         
         if (request.getUser_id() == null || request.getCourse_id() == null) {
-            return ResponseEntity.badRequest().build(); // Basic validation
+            return ResponseEntity.badRequest().build();
         }
         
         ProgressTracker tracker = progressTrackerService.getOrCreateTracker(request.getUser_id(), request.getCourse_id());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(tracker);
+        return ResponseEntity.ok(tracker);
     }
 
-    /**
-     * Updates progress after completing a quiz.
-     * Uses PUT as it's an update operation.
-     */
     @PutMapping
     public ResponseEntity<ProgressTracker> updateProgress(@RequestBody ProgressRequestDTO request) 
             throws ExecutionException, InterruptedException {
         
+        // You could add validation for quizScore here if needed
         if (request.getUser_id() == null || request.getCourse_id() == null) {
             return ResponseEntity.badRequest().build();
         }
@@ -51,10 +43,9 @@ public class ProgressTrackerController {
         ProgressTracker updatedTracker = progressTrackerService.updateProgress(
             request.getUser_id(), 
             request.getCourse_id(), 
-            request.getProficiency_score()
+            request.getProficiency_score(),
+            request.getQuiz_score() 
         );
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updatedTracker);
+        return ResponseEntity.ok(updatedTracker);
     }
-
-
 }

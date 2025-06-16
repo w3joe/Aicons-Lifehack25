@@ -2,8 +2,6 @@ package aicon.lifehack.central_learning.service;
 
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.model.Topic;
-import aicon.lifehack.central_learning.model.User;
-
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;

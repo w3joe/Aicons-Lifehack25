@@ -1,10 +1,8 @@
 package aicon.lifehack.central_learning.service;
 
 import aicon.lifehack.central_learning.dto.QuizDetailsDTO;
-import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.model.Question;
 import aicon.lifehack.central_learning.model.Quiz;
-import aicon.lifehack.central_learning.model.User;
 
 import com.google.cloud.firestore.*;
 import org.springframework.stereotype.Service;

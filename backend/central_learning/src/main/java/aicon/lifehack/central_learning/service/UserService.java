@@ -7,8 +7,6 @@ import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.SetOptions;
-import com.google.cloud.firestore.WriteResult;
 import org.springframework.stereotype.Service;
 import com.google.cloud.firestore.QuerySnapshot; 
 import java.util.Date;

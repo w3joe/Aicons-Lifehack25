@@ -1,13 +1,16 @@
 package aicon.lifehack.central_learning.service;
 
-import aicon.lifehack.central_learning.dto.UpdateProgressDTO;
 import aicon.lifehack.central_learning.model.Difficulty;
+import aicon.lifehack.central_learning.model.Lesson;
 import aicon.lifehack.central_learning.model.ProgressTracker;
+import aicon.lifehack.central_learning.model.StudentProgress;
+
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import org.springframework.stereotype.Service;
+import java.util.Date;
 
 import java.util.concurrent.ExecutionException;
 
@@ -15,18 +18,21 @@ import java.util.concurrent.ExecutionException;
 public class ProgressTrackerService {
 
     private final Firestore firestore;
-    private static final String COLLECTION_NAME = "progress_trackers";
+    private final LessonService lessonService; // Make sure this is injected
 
-    public ProgressTrackerService(Firestore firestore) {
+    private static final String PROGRESS_TRACKERS_COLLECTION = "progress_trackers";
+    private static final String STUDENT_PROGRESS_COLLECTION = "student_progress";
+
+    public ProgressTrackerService(Firestore firestore, LessonService lessonService) {
         this.firestore = firestore;
+        this.lessonService = lessonService;
     }
 
     private DocumentReference getTrackerRef(String userId, String courseId) {
         String progressId = userId + "_" + courseId;
-        return firestore.collection(COLLECTION_NAME).document(progressId);
+        return firestore.collection(PROGRESS_TRACKERS_COLLECTION).document(progressId);
     }
     
-    // Gets a tracker, or creates a default one if it doesn't exist.
     public ProgressTracker getOrCreateTracker(String userId, String courseId) throws ExecutionException, InterruptedException {
         DocumentReference trackerRef = getTrackerRef(userId, courseId);
         DocumentSnapshot trackerSnapshot = trackerRef.get().get();
@@ -34,50 +40,94 @@ public class ProgressTrackerService {
         if (trackerSnapshot.exists()) {
             return trackerSnapshot.toObject(ProgressTracker.class);
         } else {
-            // Create a new default tracker
             ProgressTracker newTracker = new ProgressTracker();
             newTracker.setProgress_id(trackerRef.getId());
             newTracker.setUser_id(userId);
             newTracker.setCourse_id(courseId);
-            newTracker.setCurrent_lesson_number(1); // Start at lesson 1
-            newTracker.setCurrent_difficulty(Difficulty.INTERMEDIATE); // Default difficulty
+            newTracker.setCurrent_lesson_number(1);
+            newTracker.setCurrent_difficulty(Difficulty.INTERMEDIATE);
 
             trackerRef.set(newTracker).get();
             return newTracker;
         }
     }
     
-    
-    public ProgressTracker updateProgress(String userId, String courseId, double proficiencyScore) throws ExecutionException, InterruptedException {
+    // --- THIS IS THE FULLY CORRECTED METHOD ---
+    public ProgressTracker updateProgress(String userId, String courseId, double proficiencyScore, double quizScore) throws ExecutionException, InterruptedException {
         DocumentReference trackerRef = getTrackerRef(userId, courseId);
         
         firestore.runTransaction(transaction -> {
+            // --- READ PHASE: ALL READS MUST HAPPEN FIRST ---
+            
+            // 1. Read the main progress tracker to get current state.
             DocumentSnapshot trackerSnapshot = transaction.get(trackerRef).get();
             if (!trackerSnapshot.exists()) {
                 throw new IllegalStateException("Progress tracker not found. Cannot update.");
             }
+            
+            // We need the lesson number to find the lesson that was just completed.
+            int currentLessonNumber = trackerSnapshot.getLong("current_lesson_number").intValue();
+            
+            // 2. Find the lesson document to get its ID.
+            // This query happens outside the transaction's read set, but it's necessary
+            // to get the ID we need for the next read.
+            Lesson completedLesson = lessonService.getLessonsByCourse(courseId).stream()
+                .filter(lesson -> lesson.getLesson_number() == currentLessonNumber)
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Could not find lesson with number: " + currentLessonNumber));
+            
+            // 3. Prepare to read the specific student_progress record for this lesson.
+            String studentProgressId = userId + "_" + completedLesson.getLesson_id();
+            DocumentReference studentProgressRef = firestore.collection(STUDENT_PROGRESS_COLLECTION).document(studentProgressId);
+            DocumentSnapshot studentProgressSnapshot = transaction.get(studentProgressRef).get();
 
+
+            // --- LOGIC AND WRITE PHASE ---
+            
             ProgressTracker currentTracker = trackerSnapshot.toObject(ProgressTracker.class);
             Difficulty currentDifficulty = currentTracker.getCurrent_difficulty();
-            
+        
             Difficulty newDifficulty = calculateNewDifficulty(currentDifficulty, proficiencyScore);
             boolean shouldIncrementLesson = shouldIncrementLesson(currentDifficulty, newDifficulty, proficiencyScore);
             
+            // Write #1: Apply updates to the main tracker
             if (shouldIncrementLesson) {
                 transaction.update(trackerRef, "current_lesson_number", FieldValue.increment(1));
             }
             transaction.update(trackerRef, "current_difficulty", newDifficulty);
+
+            // Write #2: Apply writes to the student progress record
+            Difficulty nextTimeDifficultyForThisLesson = calculateNewDifficulty(currentDifficulty, proficiencyScore);
             
-            return null; 
+            if (studentProgressSnapshot.exists()) {
+                // Update existing student progress
+                transaction.update(studentProgressRef, "attempts", FieldValue.increment(1));
+                transaction.update(studentProgressRef, "latest_proficiency_score", proficiencyScore);
+                transaction.update(studentProgressRef, "quiz_score", quizScore);
+                transaction.update(studentProgressRef, "completed_at", new Date());
+                transaction.update(studentProgressRef, "next_time_difficulty", nextTimeDifficultyForThisLesson);
+            } else {
+                // Create new student progress record
+                StudentProgress newProgress = new StudentProgress();
+                newProgress.setProgress_id(studentProgressId);
+                newProgress.setUser_id(userId);
+                newProgress.setLesson_id(completedLesson.getLesson_id());
+                newProgress.setAttempts(1);
+                newProgress.setLatest_proficiency_score(proficiencyScore);
+                newProgress.setCompleted_at(new Date());
+                newProgress.setNext_time_difficulty(nextTimeDifficultyForThisLesson);
+                transaction.set(studentProgressRef, newProgress);
+            }
+            
+            return null; // Transaction must return something.
         }).get();
 
-        DocumentSnapshot updatedSnapshot = trackerRef.get().get();
-        if (updatedSnapshot.exists()) {
-            return updatedSnapshot.toObject(ProgressTracker.class);
-        } else {
-            throw new IllegalStateException("Progress tracker disappeared after update.");
-        }
+        // After the transaction, re-fetch the main tracker to return its final, committed state.
+        return trackerRef.get().get().toObject(ProgressTracker.class);
     }
+    
+
+
 
     private Difficulty calculateNewDifficulty(Difficulty current, double score) {
         if (score >= 86.0) {
