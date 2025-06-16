@@ -10,12 +10,14 @@ import {
 import { getCourseById } from "@/services/courseService";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
-import Video from "react-native-video";
 import { Ionicons } from "@expo/vector-icons";
 import { Course } from "@/models/Course";
+import { Topic } from "@/models/Topic";
+import { getTopicById } from "@/services/topicService";
 
 export default function CourseDetailScreen(course_id: string) {
   const [course, setCourse] = useState<Course | null>(null);
+  const [topic, setTopic] = useState<Topic | null>(null);
   const [expandedLessonIndex, setExpandedLessonIndex] = useState<number | null>(
     null
   );
@@ -23,8 +25,10 @@ export default function CourseDetailScreen(course_id: string) {
   useEffect(() => {
     (async () => {
       try {
-        const data = await getCourseById("7DrKhURbwdILpTbAwIQf");
-        setCourse(data.body);
+        const courseData = await getCourseById("7DrKhURbwdILpTbAwIQf");
+        const topicData = await getTopicById(courseData.body.topic_id);
+        setCourse(courseData.body);
+        setTopic(topicData.body);
       } catch (err) {
         console.error(err);
       }
@@ -71,7 +75,7 @@ export default function CourseDetailScreen(course_id: string) {
         <Text style={styles.title}>{course.title}</Text>
 
         <View style={styles.detailsRow}>
-          <Text style={styles.detailItem}>{course.topic_id}</Text>
+          <Text style={styles.detailItem}>{topic?.name}</Text>
         </View>
 
         <Text style={styles.sectionTitle}>About this course</Text>
