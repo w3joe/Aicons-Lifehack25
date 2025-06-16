@@ -13,4 +13,5 @@ public class Lesson {
     private String title;
     private String time_taken;
     // You could add more fields here later, like 'video_url', 'content', 'lesson_order', etc.
+    private String Description;
 }

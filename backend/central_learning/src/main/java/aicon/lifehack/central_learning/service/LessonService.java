@@ -57,6 +57,9 @@ public class LessonService {
             if (lesson.getTitle() != null) {
                 existingLesson.setTitle(lesson.getTitle());
             }
+            if(lesson.getDescription() != null){
+                existingLesson.setDescription(lesson.getDescription());
+            }
             if (lesson.getTime_taken() != null) {
                 existingLesson.setTime_taken(lesson.getTime_taken());
             }
