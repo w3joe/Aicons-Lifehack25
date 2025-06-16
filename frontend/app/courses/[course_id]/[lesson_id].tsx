@@ -54,7 +54,7 @@ export default function LessonPage() {
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{lesson.title}</Text>
-        <View style={{ width: 24 }} /> {/* For alignment */}
+        <View style={{ width: 24 }} />
       </View>
       {/* Course details */}
       <View style={styles.content}>
@@ -71,7 +71,8 @@ export default function LessonPage() {
 
         <TouchableOpacity
           style={styles.quizButton}
-          onPress={() => router.push(`/quizzes/${lesson.quiz_id}`)}
+          // onPress={() => router.push(`/quizzes/${lesson.quiz_id}`)}
+          onPress={() => router.push(`/quizzes/rand`)}
         >
           <Text style={styles.quizButtonText}>Take Quiz</Text>
         </TouchableOpacity>

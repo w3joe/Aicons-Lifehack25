@@ -1,33 +1,44 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { useRouter } from "expo-router";
 
 const quizData = [
   {
     id: "1",
     question: "What is the capital of France?",
     options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-    correctAnswer: "Paris",
+    correct_answer: "Paris",
   },
   {
     id: "2",
     question: "What is 2 + 2?",
     options: ["3", "4", "5", "22"],
-    correctAnswer: "4",
+    correct_answer: "4",
   },
   {
     id: "3",
     question: "Who wrote Hamlet?",
     options: ["Shakespeare", "Hemingway", "Tolkien", "Rowling"],
-    correctAnswer: "Shakespeare",
+    correct_answer: "Shakespeare",
   },
 ];
 
 const confidenceLevels = ["No Idea", "Maybe", "I Think So", "Definitely"];
 
+const confidenceLevelsValue: { [key: string]: number } = {
+  "No Idea": 0.0, // red
+  Maybe: 0.33, // yellow
+  "I Think So": 0.77, // light green
+  Definitely: 1.0, // dark green
+};
+
 export default function QuizScreen() {
+  const router = useRouter();
+
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: string;
   }>({});
+  const [answerSelected, setAnswerSelected] = useState<boolean>(false);
   const [confidenceLevelsPerQ, setConfidenceLevelsPerQ] = useState<{
     [key: string]: string;
   }>({});
@@ -40,12 +51,15 @@ export default function QuizScreen() {
 
   const selectOption = (questionId: string, answer: string) => {
     if (submittedQuestions[questionId]) return;
+    setAnswerSelected(true);
     setSelectedAnswers((prev) => ({ ...prev, [questionId]: answer }));
   };
 
   const selectConfidence = (questionId: string, level: string) => {
     if (submittedQuestions[questionId]) return;
     setConfidenceLevelsPerQ((prev) => ({ ...prev, [questionId]: level }));
+    submitCurrentQuestion();
+    setAnswerSelected(false);
   };
 
   const submitCurrentQuestion = () => {
@@ -53,28 +67,26 @@ export default function QuizScreen() {
       Alert.alert("Select an answer first.");
       return;
     }
-
     setSubmittedQuestions((prev) => ({ ...prev, [question.id]: true }));
   };
 
   const calculateFinalScore = () => {
     let score = 0;
     quizData.forEach((q) => {
-      if (selectedAnswers[q.id] === q.correctAnswer) {
-        score += 1;
+      if (selectedAnswers[q.id] === q.correct_answer) {
+        score += 1 * confidenceLevelsValue[confidenceLevelsPerQ[q.id]];
+        console.log(score);
       }
+      router.back();
     });
 
-    Alert.alert(
-      "Quiz Completed",
-      `You scored ${score} out of ${quizData.length}`
-    );
+    window.alert(`You scored ${score} out of ${quizData.length}`);
     console.log("Confidence Levels:", confidenceLevelsPerQ);
   };
 
   const isSubmitted = submittedQuestions[question.id];
   const selected = selectedAnswers[question.id];
-  const isCorrect = selected === question.correctAnswer;
+  const isCorrect = selected === question.correct_answer;
 
   return (
     <View style={styles.container}>
@@ -83,7 +95,7 @@ export default function QuizScreen() {
 
         {question.options.map((option) => {
           const isSelected = selected === option;
-          const isAnswer = isSubmitted && option === question.correctAnswer;
+          const isAnswer = isSubmitted && option === question.correct_answer;
           return (
             <TouchableOpacity
               key={option}
@@ -94,7 +106,7 @@ export default function QuizScreen() {
                 isAnswer && styles.correctOption,
                 isSubmitted &&
                   selected === option &&
-                  selected !== question.correctAnswer &&
+                  selected !== question.correct_answer &&
                   styles.incorrectOption,
               ]}
               onPress={() => selectOption(question.id, option)}
@@ -104,50 +116,35 @@ export default function QuizScreen() {
           );
         })}
 
-        <View style={styles.confidenceContainer}>
-          {confidenceLevels.map((level) => {
-            const isSelected = confidenceLevelsPerQ[question.id] === level;
-            return (
-              <TouchableOpacity
-                key={level}
-                disabled={isSubmitted}
-                onPress={() => selectConfidence(question.id, level)}
-                style={[
-                  styles.confidenceButton,
-                  isSelected && styles.selectedConfidenceButton,
-                ]}
-              >
-                <Text style={styles.confidenceButtonText}>{level}</Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
         {isSubmitted && (
           <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "500" }}>
             {isCorrect
               ? "✅ Correct!"
-              : `❌ Incorrect. Correct Answer: ${question.correctAnswer}`}
+              : `❌ Incorrect. Correct Answer: ${question.correct_answer}`}
           </Text>
         )}
       </View>
 
       <View style={styles.navContainer}>
-        {currentQuestionIndex > 0 && (
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentQuestionIndex((prev) => prev - 1)}
-          >
-            <Text style={styles.navButtonText}>Previous</Text>
-          </TouchableOpacity>
-        )}
         {!isSubmitted ? (
-          <TouchableOpacity
-            style={[styles.navButton, styles.submitButton]}
-            onPress={submitCurrentQuestion}
-          >
-            <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
+          <View style={styles.confidenceContainer}>
+            {confidenceLevels.map((level) => {
+              const isSelected = confidenceLevelsPerQ[question.id] === level;
+              return (
+                <TouchableOpacity
+                  key={level}
+                  disabled={isSubmitted}
+                  onPress={() => selectConfidence(question.id, level)}
+                  style={[
+                    styles.confidenceButton,
+                    !answerSelected && styles.deselectConfidenceButton,
+                  ]}
+                >
+                  <Text style={styles.confidenceButtonText}>{level}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         ) : currentQuestionIndex < quizData.length - 1 ? (
           <TouchableOpacity
             style={styles.navButton}
@@ -214,18 +211,18 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   confidenceButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    backgroundColor: "#e0e0e0",
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+    backgroundColor: "#007aff",
     borderRadius: 6,
     marginRight: 6,
     marginTop: 6,
   },
-  selectedConfidenceButton: {
-    backgroundColor: "#a5d6a7",
+  deselectConfidenceButton: {
+    backgroundColor: "#d0e8ff",
   },
   confidenceButtonText: {
-    fontSize: 14,
+    fontSize: 16,
   },
   navContainer: {
     flexDirection: "row",
