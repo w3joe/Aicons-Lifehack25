@@ -13,7 +13,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Home() {
   type Topic = {
-    id: number;
+    id: string;
     name: string;
     description: string;
   };
@@ -23,20 +23,16 @@ export default function Home() {
     name: string;
     author: string;
     date: string;
-    topicId: number;
+    topicId: string;
   };
 
   const router = useRouter();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [selectedTopicId, setSelectedTopicId] = useState<number | null>(null);
+  const [selectedTopicId, setSelectedTopicId] = useState<string  | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
 
-  const courses: Course[] = [
-    { id: 1, name: "Course 1", author: "Alice", date: "2025-06-12", topicId: 1 },
-    { id: 2, name: "Course 2", author: "Bob", date: "2025-05-20", topicId: 2 },
-    { id: 3, name: "Course 3", author: "Carol", date: "2025-04-15", topicId: 1 },
-  ];
 
   // Check login status on mount
   useEffect(() => {
@@ -46,6 +42,7 @@ export default function Home() {
     };
     checkLoginStatus();
   }, []);
+
 
   // Fetch topics from backend on mount
   useEffect(() => {
@@ -70,31 +67,81 @@ export default function Home() {
     };
 
     fetchTopics();
+    fetchAllCourses();
   }, []);
 
-  const filteredCourses = selectedTopicId
-    ? courses.filter((course) => course.topicId === selectedTopicId)
-    : courses;
+  const fetchAllCourses = async () => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/courses`);
+    const data = await response.json();
+    const courseArray = Array.isArray(data.body) ? data.body : [];
+    const normalizedCourses: Course[] = courseArray.map((course: any) => ({
+      id: course.course_id,
+      name: course.title,
+      author: course.author,
+      date: course.date,
+      topicId: course.topic_id,
+    }));
+    
+    setCourses(normalizedCourses);
+  } catch (error) {
+    console.error("Error fetching all courses:", error);
+    showAlert("Error", "Unable to load all courses.");
+  }
+  };
 
+
+  // Filter courses based on selected topic
+  const filteredCourses = selectedTopicId
+    ? courses.filter((course) => course.topicId === selectedTopicId) : courses;
+
+  const fetchCoursesByTopic = async (topicId: string) => {
+  try {
+    const response = await fetch(`http://localhost:8080/api/topics/${topicId}/courses`);
+    const data = await response.json();
+    const courseArray = Array.isArray(data.body) ? data.body : [];
+    const normalizedCourses: Course[] = courseArray.map((course: any) => ({
+      id: course.course_id,
+      name: course.title,
+      author: course.author,
+      date: course.date,
+      topicId: course.topic_id,
+    }));
+    setCourses(normalizedCourses);
+    } catch (error) {
+      console.error("Error fetching courses for topic:", error);
+      showAlert("Error", "Unable to load courses for selected topic.");
+    }
+  };
+
+
+  // Check if user is logged in
   const handleLoginLogout = async () => {
     if (isLoggedIn) {
       await AsyncStorage.removeItem("userToken");
       setIsLoggedIn(false);
-      Alert.alert("Logged out");
+      showAlert("AITUTOR", "Logged out");
       router.push("/login");
     } else {
       router.push("/login");
     }
   };
 
+
+  // Directs to all courses page
   const handleSeeMore = () => {
     router.push("/courses");
   };
 
-  const handleTopicPress = (topicId: number) => {
+
+  // Make Topic ID == selected ID & filter courses based on selected ID
+  const handleTopicPress = (topicId: string) => {
     setSelectedTopicId(topicId);
+    fetchCoursesByTopic(topicId);
   };
 
+
+  // Alert wrapper for web and app
   const showAlert = (title: string, message: string) => {
     if (Platform.OS === "web") {
       alert(`${title}: ${message}`);
@@ -110,6 +157,13 @@ export default function Home() {
     >
       <View style={styles.topBar}>
         <Text style={styles.header}>AITUTOR</Text>
+
+        <TouchableOpacity
+          style={styles.dashboardButton}
+          onPress={() => router.push("/teacher")}
+        >
+          <Text style={styles.dashboardButtonText}>Teachers Dashboard</Text>
+        </TouchableOpacity>
 
         <TouchableOpacity style={styles.loginButton} onPress={handleLoginLogout}>
           <Text style={styles.loginButtonText}>{isLoggedIn ? "Logout" : "Login"}</Text>
@@ -140,7 +194,12 @@ export default function Home() {
         </View>
 
         {selectedTopicId !== null && (
-          <TouchableOpacity onPress={() => setSelectedTopicId(null)}>
+          <TouchableOpacity
+            onPress={() => {
+            setSelectedTopicId(null);
+            fetchAllCourses();   // Fetch all courses when showing all
+            }}
+          >
             <Text style={styles.clickablelink}>Show All Courses</Text>
           </TouchableOpacity>
         )}
@@ -186,6 +245,21 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#007AFF",
+  },
+  dashboardButton: {
+  marginRight: 10,
+  paddingVertical: 6,
+  paddingHorizontal: 12,
+  backgroundColor: "#2a9d8f",
+  borderRadius: 5,
+  justifyContent: "center",
+  alignItems: "center",
+  },
+
+  dashboardButtonText: {
+  color: "white",
+  fontWeight: "bold",
+  fontSize: 14,
   },
   loginButton: {
     backgroundColor: "#007AFF",

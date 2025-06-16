@@ -1,4 +1,4 @@
-// src/services/courseService.ts
+
 import api from '../api/api';
 
 export const getTopicById = async (topicId: string) => {
@@ -6,7 +6,7 @@ export const getTopicById = async (topicId: string) => {
     const response = await api.get(`/topic/${topicId}`);
     return response.data;
   } catch (error) {
-    console.error('Failed to fetch course details:', error);
+    console.error('Failed to fetch topic details:', error);
     throw error;
   }
 };
