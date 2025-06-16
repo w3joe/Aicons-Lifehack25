@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
+import { Quiz } from "@/models/Quiz";
+import { getQuizWithQuestions } from "@/services/quizService";
 
 const quizData = [
   {
@@ -35,6 +37,19 @@ const confidenceLevelsValue: { [key: string]: number } = {
 export default function QuizScreen() {
   const router = useRouter();
 
+  const [quiz, setQuiz] = useState<Quiz | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const data = await getQuizWithQuestions("xcMz4tXgYqFQ5HwsO5bx");
+        setQuiz(data.body);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, ["xcMz4tXgYqFQ5HwsO5bx"]);
+
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: string;
   }>({});
@@ -47,7 +62,7 @@ export default function QuizScreen() {
   }>({});
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
-  const question = quizData[currentQuestionIndex];
+  const question = quiz?.questions?.at(currentQuestionIndex);
 
   const selectOption = (questionId: string, answer: string) => {
     if (submittedQuestions[questionId]) return;
@@ -63,37 +78,37 @@ export default function QuizScreen() {
   };
 
   const submitCurrentQuestion = () => {
-    if (!selectedAnswers[question.id]) {
+    if (!selectedAnswers[question?.question_id!]) {
       Alert.alert("Select an answer first.");
       return;
     }
-    setSubmittedQuestions((prev) => ({ ...prev, [question.id]: true }));
+    setSubmittedQuestions((prev) => ({
+      ...prev,
+      [question?.question_id!]: true,
+    }));
   };
 
   const calculateFinalScore = () => {
     let score = 0;
-    quizData.forEach((q) => {
-      if (selectedAnswers[q.id] === q.correct_answer) {
-        score += 1 * confidenceLevelsValue[confidenceLevelsPerQ[q.id]];
-        console.log(score);
+    quiz?.questions!.forEach((q) => {
+      if (selectedAnswers[q.question_id] === q.correct_answer) {
+        score += 1 * confidenceLevelsValue[confidenceLevelsPerQ[q.question_id]];
       }
-      router.back();
     });
-
-    window.alert(`You scored ${score} out of ${quizData.length}`);
-    console.log("Confidence Levels:", confidenceLevelsPerQ);
+    window.alert(score);
+    router.back();
   };
 
-  const isSubmitted = submittedQuestions[question.id];
-  const selected = selectedAnswers[question.id];
-  const isCorrect = selected === question.correct_answer;
+  const isSubmitted = submittedQuestions[question?.question_id!];
+  const selected = selectedAnswers[question?.question_id!];
+  const isCorrect = selected === question?.correct_answer;
 
   return (
     <View style={styles.container}>
       <View style={styles.questionContainer}>
-        <Text style={styles.questionText}>{question.question}</Text>
+        <Text style={styles.questionText}>{question?.question_text}</Text>
 
-        {question.options.map((option) => {
+        {question?.options.map((option) => {
           const isSelected = selected === option;
           const isAnswer = isSubmitted && option === question.correct_answer;
           return (
@@ -109,7 +124,7 @@ export default function QuizScreen() {
                   selected !== question.correct_answer &&
                   styles.incorrectOption,
               ]}
-              onPress={() => selectOption(question.id, option)}
+              onPress={() => selectOption(question?.question_id, option)}
             >
               <Text style={styles.optionText}>{option}</Text>
             </TouchableOpacity>
@@ -120,7 +135,9 @@ export default function QuizScreen() {
           <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "500" }}>
             {isCorrect
               ? "✅ Correct!"
-              : `❌ Incorrect. Correct Answer: ${question.correct_answer}`}
+              : `❌ Incorrect. Correct Answer: ${question?.correct_answer}
+${question?.explanation}
+                `}
           </Text>
         )}
       </View>
@@ -129,12 +146,15 @@ export default function QuizScreen() {
         {!isSubmitted ? (
           <View style={styles.confidenceContainer}>
             {confidenceLevels.map((level) => {
-              const isSelected = confidenceLevelsPerQ[question.id] === level;
+              const isSelected =
+                confidenceLevelsPerQ[question?.question_id!] === level;
               return (
                 <TouchableOpacity
                   key={level}
                   disabled={isSubmitted}
-                  onPress={() => selectConfidence(question.id, level)}
+                  onPress={() =>
+                    selectConfidence(question?.question_id!, level)
+                  }
                   style={[
                     styles.confidenceButton,
                     !answerSelected && styles.deselectConfidenceButton,
