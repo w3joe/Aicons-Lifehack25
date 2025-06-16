@@ -32,7 +32,8 @@ public class CourseController {
     public ResponseEntity<?> createCourse(@RequestBody Course course) throws ExecutionException, InterruptedException {
         Course createdCourse = courseService.createCourse(course);
         URI location = URI.create("/api/courses/" + createdCourse.getCourse_id());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.created(location).body(createdCourse));
+        //return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.created(location).body(createdCourse));
+        return ResponseEntity.created(location).body(createdCourse);
     }
 
     @GetMapping("/{courseId}")

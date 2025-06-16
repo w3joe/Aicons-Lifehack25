@@ -3,6 +3,8 @@ package aicon.lifehack.central_learning.controller;
 import aicon.lifehack.central_learning.dto.ProgressRequestDTO; // Add this
 import aicon.lifehack.central_learning.model.ProgressTracker;
 import aicon.lifehack.central_learning.service.ProgressTrackerService;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,7 +33,7 @@ public class ProgressTrackerController {
         }
         
         ProgressTracker tracker = progressTrackerService.getOrCreateTracker(request.getUser_id(), request.getCourse_id());
-        return ResponseEntity.ok(tracker);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(tracker);
     }
 
     /**
@@ -42,15 +44,17 @@ public class ProgressTrackerController {
     public ResponseEntity<ProgressTracker> updateProgress(@RequestBody ProgressRequestDTO request) 
             throws ExecutionException, InterruptedException {
         
-        if (request.getUser_id() == null || request.getCourse_id() == null || request.getNew_difficulty() == null) {
-            return ResponseEntity.badRequest().build(); // Basic validation
+        if (request.getUser_id() == null || request.getCourse_id() == null) {
+            return ResponseEntity.badRequest().build();
         }
                 
         ProgressTracker updatedTracker = progressTrackerService.updateProgress(
             request.getUser_id(), 
             request.getCourse_id(), 
-            request.getNew_difficulty()
+            request.getProficiency_score()
         );
-        return ResponseEntity.ok(updatedTracker);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(updatedTracker);
     }
+
+
 }

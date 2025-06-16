@@ -47,28 +47,73 @@ public class ProgressTrackerService {
         }
     }
     
-    public ProgressTracker updateProgress(String userId, String courseId, Difficulty newDifficulty) throws ExecutionException, InterruptedException {
-    DocumentReference trackerRef = getTrackerRef(userId, courseId);
-            firestore.runTransaction(transaction -> {
+    
+    public ProgressTracker updateProgress(String userId, String courseId, double proficiencyScore) throws ExecutionException, InterruptedException {
+        DocumentReference trackerRef = getTrackerRef(userId, courseId);
+        
+        firestore.runTransaction(transaction -> {
             DocumentSnapshot trackerSnapshot = transaction.get(trackerRef).get();
             if (!trackerSnapshot.exists()) {
                 throw new IllegalStateException("Progress tracker not found. Cannot update.");
             }
 
-            transaction.update(trackerRef, "current_lesson_number", FieldValue.increment(1));
+            ProgressTracker currentTracker = trackerSnapshot.toObject(ProgressTracker.class);
+            Difficulty currentDifficulty = currentTracker.getCurrent_difficulty();
             
-            // Use the newDifficulty parameter directly
+            Difficulty newDifficulty = calculateNewDifficulty(currentDifficulty, proficiencyScore);
+            boolean shouldIncrementLesson = shouldIncrementLesson(currentDifficulty, newDifficulty, proficiencyScore);
+            
+            if (shouldIncrementLesson) {
+                transaction.update(trackerRef, "current_lesson_number", FieldValue.increment(1));
+            }
             transaction.update(trackerRef, "current_difficulty", newDifficulty);
             
             return null; 
         }).get();
 
-        // The re-fetch logic also remains the same
         DocumentSnapshot updatedSnapshot = trackerRef.get().get();
         if (updatedSnapshot.exists()) {
             return updatedSnapshot.toObject(ProgressTracker.class);
         } else {
             throw new IllegalStateException("Progress tracker disappeared after update.");
         }
+    }
+
+    private Difficulty calculateNewDifficulty(Difficulty current, double score) {
+        if (score >= 86.0) {
+            switch (current) {
+                case REMEDIAL: return Difficulty.BEGINNER;
+                case BEGINNER: return Difficulty.INTERMEDIATE;
+                case INTERMEDIATE: return Difficulty.ADVANCED;
+                case ADVANCED: return Difficulty.ADVANCED;
+            }
+        } else if (score >= 66.0) {
+            return current;
+        } else {
+            switch (current) {
+                case ADVANCED: return Difficulty.INTERMEDIATE;
+                case INTERMEDIATE: return Difficulty.BEGINNER;
+                case BEGINNER: return Difficulty.REMEDIAL;
+                case REMEDIAL: return Difficulty.REMEDIAL;
+            }
+        }
+        return current;
+    }
+    
+    private boolean shouldIncrementLesson(Difficulty oldDifficulty, Difficulty newDifficulty, double score) {
+        // Rule #1: The "Remedial Gate"
+        // If the difficulty was just lowered TO Remedial, do not advance.
+        if (newDifficulty == Difficulty.REMEDIAL && oldDifficulty != Difficulty.REMEDIAL) {
+            return false;
+        }
+        
+        // Rule #2: The "Remedial Exit"
+        // If the user is currently at the Remedial level, they have stricter requirements to advance.
+        if (oldDifficulty == Difficulty.REMEDIAL) {
+            return score >= 86.0;
+        }
+        
+        // In all other cases, the user progresses to the next lesson.
+        return true;
     }
 }
