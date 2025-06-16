@@ -4,4 +4,5 @@ export interface Lesson {
   quiz_id?: string; // Optional
   title: string;
   time_taken: string;
+  description: string;
 }
