@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   View,
+  Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -35,18 +36,32 @@ export default function Home() {
     }
   };
 
+  const showAlert = (title: string, message: string) => {
+    if (Platform.OS === 'web') {
+      alert(`${title}: ${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
+
   const courses = [
     { id: 1, name: "Course 1", author: "Alice", date: "2025-06-12" },
     { id: 2, name: "Course 2", author: "Bob", date: "2025-05-20" },
     { id: 3, name: "Course 3", author: "Carol", date: "2025-04-15" },
   ];
 
+   const topics = [
+    { id: 1, name: "Math" },
+    { id: 2, name: "Computing" },
+    { id: 3, name: "Science" },
+  ];
+
   const handleSeeMore = () => {
     router.push("/courses"); // Navigate to full courses page
   };
 
-  const handleTopicPress = (courseName: string) => {
-    Alert.alert("Course Selected", `You tapped on ${courseName}`);
+  const handleTopicPress = (topic_id: number) => {
+    router.push(`/topic/${topic_id}`);
   };
 
   return (
@@ -78,7 +93,7 @@ export default function Home() {
         </View>
 
         {courses.map((course) => (
-          <View
+          <TouchableOpacity
             key={course.id}
             style={styles.subcard}
           >
@@ -86,9 +101,25 @@ export default function Home() {
             <Text style={styles.cardDetail}>By {course.author}</Text>
             <Text style={styles.cardDetail}>Created on {course.date}</Text>
             
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
+
+      <View style={styles.titlecard}>
+        <Text style={styles.sectionTitle}>Topics</Text>
+        <ScrollView nestedScrollEnabled={true}>
+          {topics.map((topic) => (
+          <TouchableOpacity
+            key={topic.id}
+            style={styles.subcard}
+            onPress={() => handleTopicPress(topic.id)}
+          >
+            <Text style={styles.cardTitle}>{topic.name}</Text>
+          </TouchableOpacity>
+        ))}
+        </ScrollView>
+      </View>
+
 
       <View style={styles.titlecard}>
         <Text style={styles.sectionTitle}>📥 Saved Courses</Text>

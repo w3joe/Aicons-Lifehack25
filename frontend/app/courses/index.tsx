@@ -44,7 +44,7 @@ export default function CoursesScreen() {
         <Text style={styles.backButtonText}>← Back to Home</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>All Courses</Text>
+      <Text style={styles.header}>Top Courses</Text>
 
       {courses.map((course) => (
         <TouchableOpacity
