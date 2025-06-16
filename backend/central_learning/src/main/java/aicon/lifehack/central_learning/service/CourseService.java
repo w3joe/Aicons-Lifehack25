@@ -59,6 +59,7 @@ public class CourseService {
         // Here you might add a check to ensure the topic_id exists in the topics collection
         DocumentReference docRef = getCoursesCollection().document();
         course.setCourse_id(docRef.getId());
+        course.setCreated_at(new Date()); 
         docRef.set(course).get();
         return course;
     }
