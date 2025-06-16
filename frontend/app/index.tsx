@@ -208,7 +208,7 @@ export default function Home() {
           </TouchableOpacity>
         )}
 
-        {filteredCourses.map((course) => (
+        {filteredCourses.slice(0, 5).map((course) => (
           <TouchableOpacity key={course.id} style={styles.subcard}>
             <Text style={styles.cardTitle}>{course.name}</Text>
             <Text style={styles.cardDetail}>By {course.author}</Text>
