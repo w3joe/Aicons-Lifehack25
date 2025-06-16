@@ -17,7 +17,7 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     const loadUser = async () => {
-      try {
+      try {           
         const userJson = await AsyncStorage.getItem("user");
         if (userJson) {
           const parsedUser: User = JSON.parse(userJson);
@@ -82,7 +82,7 @@ export default function TeacherDashboard() {
       ))}
 
       {/* Add Course Button */}
-      <TouchableOpacity style={styles.addButton} onPress={() => alert("Add Course pressed!")}>
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addcourse")}>
         <Text style={styles.addButtonText}>+ Add New Course</Text>
       </TouchableOpacity>
     </ScrollView>

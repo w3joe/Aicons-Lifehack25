@@ -1,11 +1,27 @@
 import { useRouter } from "expo-router";
-import React from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { use, useEffect, useState } from "react";
+import { ScrollView, StyleSheet, Text, TouchableOpacity, Platform, Alert } from "react-native";
+import api from "../../api/api"
 
 export default function CoursesScreen() {
   const router = useRouter();
 
-  const courses = [
+  type Course = {
+    id: number;
+    name: string;
+    author: string;
+    date: string;
+    description: string,
+    topicId: string;
+  };
+
+  const [courses, setCourses] = useState<Course[]>([]);
+
+  useEffect(() => {
+    fetchAllCourses();
+  }, []);
+
+  /*const courses = [
     {
       course_id: "wKAhSj4WfztLoyswTVGE",
       name: "Course 1",
@@ -27,7 +43,16 @@ export default function CoursesScreen() {
       date: "2025-04-15",
       description: "In-depth learning with Course 3",
     },
-  ];
+  ]; */
+
+  // Alert wrapper for web and app
+    const showAlert = (title: string, message: string) => {
+      if (Platform.OS === "web") {
+        alert(`${title}: ${message}`);
+      } else {
+        Alert.alert(title, message);
+      }
+    };
 
   const handleCoursePress = (name: string) => {
     // Optionally: router.push(`/courses/${id}`) if you later create dynamic pages
@@ -35,12 +60,33 @@ export default function CoursesScreen() {
     router.push('../courses/${url}');
   };
 
+  const fetchAllCourses = async () => {
+  try {
+    const response = await api.get(`/courses`);
+    //const data = await response.json();
+    const data = response.data;
+    const courseArray = Array.isArray(data.body) ? data.body : [];
+    const normalizedCourses: Course[] = courseArray.map((course: any) => ({
+      id: course.course_id,
+      name: course.title,
+      author: course.author,
+      date: course.date,
+      topicId: course.topic_id,
+    }));
+    
+    setCourses(normalizedCourses);
+  } catch (error) {
+    console.error("Error fetching all courses:", error);
+    showAlert("Error", "Unable to load all courses.");
+  }
+  };
+
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+      <TouchableOpacity onPress={() => router.push('/')} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Back to Home</Text>
       </TouchableOpacity>
 
@@ -48,7 +94,7 @@ export default function CoursesScreen() {
 
       {courses.map((course) => (
         <TouchableOpacity
-          key={course.course_id}
+          key={course.id}
           style={styles.courseCard}
           activeOpacity={0.9}
           onPress={() => handleCoursePress(course.name)}
