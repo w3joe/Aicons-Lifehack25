@@ -1,17 +1,19 @@
 package aicon.lifehack.central_learning.controller;
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.service.CourseService;
+import aicon.lifehack.central_learning.service.LessonService;
 import aicon.lifehack.central_learning.model.Lesson;
-import aicon.lifehack.central_learning.model.Topic;
-import aicon.lifehack.central_learning.service.LessonService; 
 import aicon.lifehack.central_learning.dto.LikeRequestDTO; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.*;
 import aicon.lifehack.central_learning.dto.CourseDetailsDTO;
+import aicon.lifehack.central_learning.dto.CurrentLessonDTO;
+
 import java.net.URI;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 import java.util.List; 
 @RestController
 @RequestMapping("/api/courses")
@@ -20,7 +22,8 @@ public class CourseController {
     private final CourseService courseService;
     private final LessonService lessonService;
 
-   public CourseController(CourseService courseService, LessonService lessonService) {
+
+   public CourseController(CourseService courseService, LessonService lessonService ) {
         this.courseService = courseService;
         this.lessonService = lessonService;
     }
@@ -62,6 +65,21 @@ public class CourseController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Course not found with ID: " + courseId));
         }
+    }
+
+    // --- GET THE CURRENT LESSON WITH THE CORRESPONDING DIFFICULTY ---
+    @GetMapping("/{courseId}/current-lesson")
+    public ResponseEntity<?> getCurrentLesson(
+        @PathVariable String courseId, @RequestParam String userId)
+        throws ExecutionException, InterruptedException {
+            
+        CurrentLessonDTO currentLessonData = courseService.getCurrentLessonForUser(userId, courseId);
+        if (currentLessonData == null) {
+            // You could return a special object indicating course completion
+            return ResponseEntity.ok().body(null); // Or a specific DTO for "Course Complete"
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(currentLessonData)); // 200 OK
+
     }
     
     @PutMapping("/{courseId}")

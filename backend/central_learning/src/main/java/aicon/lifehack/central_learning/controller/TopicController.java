@@ -79,6 +79,7 @@ public class TopicController {
 
         }
     }
+    // --- GET ALL COURSES UNDER TOPIC ---
     @GetMapping("/{topicId}/courses")
     public ResponseEntity<?> getCoursesForTopic(@PathVariable String topicId) 
             throws ExecutionException, InterruptedException {

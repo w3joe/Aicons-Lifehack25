@@ -9,7 +9,7 @@ public class Resource {
     private String title;
     private ResourceType resource_type;
     private String url_or_content;
-
+    private Difficulty difficulty;
     // Define the enum for resource types
     public enum ResourceType {
         VIDEO,

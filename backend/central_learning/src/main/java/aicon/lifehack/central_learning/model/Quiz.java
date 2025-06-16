@@ -9,5 +9,7 @@ public class Quiz {
     private String quiz_id;
     private String title;
     private String description;
+    private Difficulty difficulty;
     private Date created_at;
+
 }

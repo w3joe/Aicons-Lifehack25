@@ -26,7 +26,13 @@ public class LessonService {
         return firestore.collection(COLLECTION_NAME);
     }
 
-    public Lesson createLesson(Lesson lesson) throws ExecutionException, InterruptedException {
+   public Lesson createLesson(Lesson lesson) throws ExecutionException, InterruptedException {
+        // 1. Find how many lessons already exist for this course to determine the new lesson number.
+        List<Lesson> existingLessons = getLessonsByCourse(lesson.getCourse_id());
+        int newLessonNumber = existingLessons.size() + 1;
+        lesson.setLesson_number(newLessonNumber);
+        
+        // 2. Create the document
         DocumentReference docRef = getLessonsCollection().document();
         lesson.setLesson_id(docRef.getId());
         docRef.set(lesson).get();

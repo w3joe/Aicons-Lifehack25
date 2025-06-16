@@ -2,11 +2,19 @@ package aicon.lifehack.central_learning.service;
 
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.model.CourseLike;
+import aicon.lifehack.central_learning.model.Difficulty;
 import aicon.lifehack.central_learning.model.Lesson;
+import aicon.lifehack.central_learning.model.ProgressTracker;
+import aicon.lifehack.central_learning.model.Quiz;
+import aicon.lifehack.central_learning.model.Resource;
 import aicon.lifehack.central_learning.model.Topic;
-import aicon.lifehack.central_learning.dto.CourseDetailsDTO; 
+import aicon.lifehack.central_learning.dto.CourseDetailsDTO;
+import aicon.lifehack.central_learning.dto.CurrentLessonDTO;
 import aicon.lifehack.central_learning.model.Lesson; 
-
+import aicon.lifehack.central_learning.service.ProgressTrackerService;
+import aicon.lifehack.central_learning.service.LessonService;
+import aicon.lifehack.central_learning.service.ResourceService;
+import aicon.lifehack.central_learning.service.QuizService;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -21,17 +29,25 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class CourseService {
 
     private final Firestore firestore;
      private final LessonService lessonService;
+    private final ProgressTrackerService progressTrackerService;
+    private final ResourceService resourceService;
+    private final QuizService quizService;
     private static final String COLLECTION_NAME = "courses";
 
-    public CourseService(Firestore firestore, LessonService lessonService) {
+    public CourseService(Firestore firestore, LessonService lessonService, ProgressTrackerService progressTrackerService,
+    ResourceService resourceService, QuizService quizService) {
         this.firestore = firestore;
         this.lessonService = lessonService;
+        this.progressTrackerService = progressTrackerService;
+        this.resourceService = resourceService;
+        this.quizService = quizService;
     }
     
     private CollectionReference getCoursesCollection() {
@@ -102,6 +118,47 @@ public class CourseService {
         return courseDetails;
     }
 
+    // --- GET CURRENT LESSONS FOR USER BASE ON DIFFICULTY ---
+    public CurrentLessonDTO getCurrentLessonForUser(String userId, String courseId) throws ExecutionException, InterruptedException {
+        // 1. Get the user's progress
+        ProgressTracker tracker = progressTrackerService.getOrCreateTracker(userId, courseId);
+        int currentLessonNumber = tracker.getCurrent_lesson_number();
+        Difficulty currentDifficulty = tracker.getCurrent_difficulty();
+
+        // 2. Find the lesson with the correct lesson number for the course
+        Lesson currentLesson = lessonService.getLessonsByCourse(courseId).stream()
+                .filter(lesson -> lesson.getLesson_number() == currentLessonNumber)
+                .findFirst()
+                .orElse(null);
+
+        if (currentLesson == null) {
+            // This could mean the user has completed the course
+            return null; 
+        }
+
+        // 3. Find all resources for that lesson, filtered by the user's difficulty
+        List<Resource> lessonResources = resourceService.getResourcesByLesson(currentLesson.getLesson_id()).stream()
+                .filter(resource -> resource.getDifficulty() == currentDifficulty)
+                .collect(Collectors.toList());
+
+        // 4. Find the quiz for that lesson, if any, that matches the user's difficulty
+        // This assumes a lesson has a quizId that points to a quiz document.
+        Quiz lessonQuiz = null;
+        if (currentLesson.getQuiz_id() != null && !currentLesson.getQuiz_id().isEmpty()) {
+            Quiz potentialQuiz = quizService.getQuiz(currentLesson.getQuiz_id());
+            if (potentialQuiz != null && potentialQuiz.getDifficulty() == currentDifficulty) {
+                lessonQuiz = potentialQuiz;
+            }
+        }
+
+        // 5. Assemble and return the DTO
+        CurrentLessonDTO dto = new CurrentLessonDTO();
+        dto.setLessonDetails(currentLesson);
+        dto.setResources(lessonResources);
+        dto.setQuiz(lessonQuiz);
+        
+        return dto;
+    }
 
     public List<Course> getLikedCoursesByUser(String userId) throws ExecutionException, InterruptedException {
         //Find all 'like' documents for the given user.
