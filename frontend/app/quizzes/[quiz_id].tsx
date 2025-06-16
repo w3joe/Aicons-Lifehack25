@@ -89,12 +89,17 @@ export default function QuizScreen() {
   };
 
   const calculateFinalScore = () => {
-    let score = 0;
+    let score = 0,
+      qnsCount = 0,
+      proficiency = 0;
     quiz?.questions!.forEach((q) => {
       if (selectedAnswers[q.question_id] === q.correct_answer) {
         score += 1 * confidenceLevelsValue[confidenceLevelsPerQ[q.question_id]];
+        qnsCount++;
       }
     });
+    proficiency = score / qnsCount;
+    
     window.alert(score);
     router.back();
   };

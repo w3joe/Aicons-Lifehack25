@@ -14,26 +14,63 @@ import { Ionicons } from "@expo/vector-icons";
 import { Course } from "@/models/Course";
 import { Topic } from "@/models/Topic";
 import { getTopicById } from "@/services/topicService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { User } from "@/models/User";
+import { createProgressTracker } from "@/services/progressTrackerService";
+import { ProgressTracker } from "@/models/ProgressTracker";
 
 export default function CourseDetailScreen(course_id: string) {
   const [course, setCourse] = useState<Course | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [progress, setProgress] = useState<ProgressTracker | null>(null);
   const [expandedLessonIndex, setExpandedLessonIndex] = useState<number | null>(
     null
   );
 
+  const getUser = async () => {
+    try {
+      const jsonValue = await AsyncStorage.getItem("user");
+      if (jsonValue != null) {
+        const user = JSON.parse(jsonValue);
+        return user;
+      }
+      return null;
+    } catch (e) {
+      console.error("Error retrieving user from storage:", e);
+      return null;
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const storedUser = await getUser();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     (async () => {
       try {
-        const courseData = await getCourseById("7DrKhURbwdILpTbAwIQf");
+        const courseData = await getCourseById("Y9YXDXtGqI9v3btEd7QM");
         const topicData = await getTopicById(courseData.body.topic_id);
         setCourse(courseData.body);
         setTopic(topicData.body);
+        const progressTracker = {
+          user_id: user?.user_id!,
+          course_id: course?.course_id!,
+        };
+        const response = await createProgressTracker(progressTracker);
+        setProgress(response);
       } catch (err) {
         console.error(err);
       }
     })();
-  }, ["7DrKhURbwdILpTbAwIQf"]);
+  }, ["Y9YXDXtGqI9v3btEd7QM"]);
 
   const router = useRouter();
 
@@ -88,7 +125,9 @@ export default function CourseDetailScreen(course_id: string) {
             )
           }
         >
-          <Text style={styles.quizButtonText}>Resume</Text>
+          <Text style={styles.quizButtonText}>
+            {progress?.current_lesson_number == 1 ? "Start":"Resume"}
+          </Text>
         </TouchableOpacity>
         <Text style={styles.sectionTitle}>Curriculum</Text>
         {course?.lessons?.map((lesson, index) => (
@@ -113,9 +152,7 @@ export default function CourseDetailScreen(course_id: string) {
             {expandedLessonIndex === index && (
               <View style={styles.expandedContent}>
                 <Text style={styles.courseDescription}>
-                  {lesson.description} blah blah alkajsdf adjsf klasdj flkajsd
-                  kl;f jasdkl;fj kl;asdj fkl;adjs klf jasdklf jaklsj fkladsj
-                  fkl;
+                  {lesson.description}
                 </Text>
               </View>
             )}
