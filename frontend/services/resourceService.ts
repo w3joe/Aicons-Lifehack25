@@ -1,11 +1,11 @@
-import api from '../api/api';
+import api from "../api/api";
 
-export const getResourceByCourseId = async (courseId: string) => {
-//   try {
-//     const response = await api.get(`/lessons/${courseId}`);
-//     return response.data;
-//   } catch (error) {
-//     console.error('Failed to fetch lesson details:', error);
-//     throw error;
-//   }
+export const getResourceByCourseId = async (lessonId: string) => {
+  try {
+    const response = await api.get(`/resources/${lessonId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch lesson resources:", error);
+    throw error;
+  }
 };
