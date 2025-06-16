@@ -1,7 +1,8 @@
 package aicon.lifehack.central_learning.controller;
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.service.CourseService;
-import aicon.lifehack.central_learning.model.Lesson; 
+import aicon.lifehack.central_learning.model.Lesson;
+import aicon.lifehack.central_learning.model.Topic;
 import aicon.lifehack.central_learning.service.LessonService; 
 import aicon.lifehack.central_learning.dto.LikeRequestDTO; 
 import org.springframework.http.HttpStatus;
@@ -40,6 +41,13 @@ public class CourseController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("Course not found with ID: " + courseId));
 
         }
+    }
+
+    // --- READ (Get All) ---
+    @GetMapping
+    public ResponseEntity<?> getAllCourses() throws ExecutionException, InterruptedException {
+        List<Course> courses = courseService.getAllCourse();
+        return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(courses)); // 200 OK
     }
 
     // --- GET A SINGLE COURSE WITH ITS LESSONS ---

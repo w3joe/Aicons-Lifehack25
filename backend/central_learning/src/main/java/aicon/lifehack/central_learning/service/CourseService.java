@@ -3,6 +3,7 @@ package aicon.lifehack.central_learning.service;
 import aicon.lifehack.central_learning.model.Course;
 import aicon.lifehack.central_learning.model.CourseLike;
 import aicon.lifehack.central_learning.model.Lesson;
+import aicon.lifehack.central_learning.model.Topic;
 import aicon.lifehack.central_learning.dto.CourseDetailsDTO; 
 import aicon.lifehack.central_learning.model.Lesson; 
 
@@ -54,6 +55,15 @@ public class CourseService {
             return document.toObject(Course.class);
         }
         return null;
+    }
+
+    // --- READ (Get All) ---
+    public List<Course> getAllCourse() throws ExecutionException, InterruptedException {
+        List<Course> courseList = new ArrayList<>();
+        getCoursesCollection().get().get().getDocuments().forEach(document -> {
+            courseList.add(document.toObject(Course.class));
+        });
+        return courseList;
     }
 
     // --- READ (Get All by Topic ID) - The Special Endpoint ---
