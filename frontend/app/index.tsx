@@ -70,7 +70,7 @@ export default function Home() {
       contentContainerStyle={{ paddingBottom: 40 }}
     >
       <View style={styles.topBar}>
-        <Text style={styles.header}>LEETFUTURE</Text>
+        <Text style={styles.header}>Aitutor</Text>
 
         <TouchableOpacity
           style={styles.loginButton}
@@ -93,15 +93,11 @@ export default function Home() {
         </View>
 
         {courses.map((course) => (
-          <TouchableOpacity
-            key={course.id}
-            style={styles.subcard}
-          >
+          <View key={course.id} style={styles.subcard}>
             <Text style={styles.cardTitle}>{course.name}</Text>
             <Text style={styles.cardDetail}>By {course.author}</Text>
             <Text style={styles.cardDetail}>Created on {course.date}</Text>
-            
-          </TouchableOpacity>
+          </View>
         ))}
       </View>
 

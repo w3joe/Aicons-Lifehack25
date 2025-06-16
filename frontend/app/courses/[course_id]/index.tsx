@@ -1,6 +1,12 @@
 import { Image } from "expo-image";
 import { StyleSheet } from "react-native";
-import { View, Text, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import { getCourseById } from "@/services/courseService";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
@@ -31,7 +37,12 @@ export default function CourseDetailScreen(course_id: string) {
     router.back();
   };
 
-  if (!course) return <Text>Loading...</Text>;
+  if (!course)
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#4A90E2" />
+      </View>
+    );
 
   return (
     <ScrollView style={styles.container} stickyHeaderIndices={[0]}>
@@ -59,21 +70,18 @@ export default function CourseDetailScreen(course_id: string) {
       <View style={styles.content}>
         <Text style={styles.title}>{course.title}</Text>
 
-        <View style={styles.metaContainer}>
-          {/* <Text style={styles.instructor}>By {course.instructor}</Text> */}
-          <View style={styles.ratingContainer}>
-            <Ionicons name="thumbs-up-sharp" size={16} color="#FFD700" />
-            <Text style={styles.ratingText}>{course.like_count}</Text>
-          </View>
-        </View>
-
         <View style={styles.detailsRow}>
           <Text style={styles.detailItem}>{course.topic_id}</Text>
         </View>
 
         <Text style={styles.sectionTitle}>About this course</Text>
         <Text style={styles.description}>{course.description}</Text>
-
+        <TouchableOpacity
+          style={styles.quizButton}
+          onPress={() => router.push(`../courses/${course_id}/${course?.lessons?.at(0)?.lesson_id}`)}
+        >
+          <Text style={styles.quizButtonText}>Resume</Text>
+        </TouchableOpacity>
         <Text style={styles.sectionTitle}>Curriculum</Text>
         {course?.lessons?.map((lesson, index) => (
           <View key={lesson.lesson_id} style={styles.lessonItemContainer}>
@@ -107,9 +115,12 @@ export default function CourseDetailScreen(course_id: string) {
                 <Text style={styles.courseDescription}>
                   {lesson.time_taken} blah jkasdfjkahfk aflkdj ladjs f
                 </Text>
-                {/* Enroll button */}
-                <TouchableOpacity style={styles.enrollButton}>
-                  <Text style={styles.enrollButtonText}>Quiz Now</Text>
+                {/* Quiz button */}
+                <TouchableOpacity
+                  style={styles.quizButton}
+                  onPress={() => router.push(`../quizzes/${lesson.quiz_id}`)}
+                >
+                  <Text style={styles.quizButtonText}>Quiz Now</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -123,6 +134,12 @@ export default function CourseDetailScreen(course_id: string) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#fff",
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center", // Centers vertically
+    alignItems: "center", // Centers horizontally
     backgroundColor: "#fff",
   },
   header: {
@@ -245,7 +262,6 @@ const styles = StyleSheet.create({
     margin: 16,
     elevation: 2,
     marginTop: 5,
-    
   },
   courseDescription: {
     fontSize: 14,
@@ -255,9 +271,9 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 250,
     marginBottom: 12,
-    position: "relative"
+    position: "relative",
   },
-  enrollButton: {
+  quizButton: {
     backgroundColor: "#1976d2",
     padding: 16,
     borderRadius: 8,
@@ -265,7 +281,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
   },
-  enrollButtonText: {
+  quizButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",
