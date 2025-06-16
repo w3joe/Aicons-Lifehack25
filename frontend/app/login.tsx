@@ -2,8 +2,9 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Button, StyleSheet, Text, TextInput, View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../api/api'; // adjust path as needed
+import api from '../api/api';
 import { Platform } from 'react-native';
+import { User } from "../models/User";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -33,28 +34,25 @@ export default function LoginScreen() {
       return;
     }
 
-    /* TODO: Add real authentication logic here
-    if (email === 'test@gmail.com' && password === 'password') {
-      await AsyncStorage.setItem('userToken', 'mock-token'); // Store token
-      Alert.alert('Login Successful');
-      router.replace('/'); // Navigate to home screen
-    } else {
-      Alert.alert('Login Failed', 'Incorrect email or password.');
-    } */
-
     try {
-      const response = await api.post('http://localhost:8080/api/auth/login', {
+      const response = await api.post('/auth/login', {
         email,
         password,
       });
 
       const token = response.data.token;
+      const user: User  = response.data.body; // user object from backend
+
+      //store in local storage
       await AsyncStorage.setItem('userToken', token);
-      showAlert('LEETFUTURE', 'Login Successful');
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+      
+      showAlert('AITUTOR', 'Login Successful');
       router.replace('/'); // navigate to home
+      
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Invalid email or password';
-      showAlert('LEETFUTURE', 'Login Failed: ' + errorMessage);
+      showAlert('AITUTOR', 'Login Failed: ' + errorMessage);
     }
   };
 
@@ -65,7 +63,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <View style={styles.titlecard}>
-        <Text style={styles.appTitle}>LEETFUTURE</Text>
+        <Text style={styles.appTitle}>AITUTOR</Text>
 
       <TextInput
         style={styles.input}

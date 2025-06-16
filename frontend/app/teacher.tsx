@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,9 +8,28 @@ import {
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
+import { User } from "../models/User";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TeacherDashboard() {
   const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const userJson = await AsyncStorage.getItem("user");
+        if (userJson) {
+          const parsedUser: User = JSON.parse(userJson);
+          setUser(parsedUser);
+        }
+      } catch (error) {
+        console.error("Failed to load user:", error);
+      }
+    };
+
+    loadUser();
+  }, []);
 
   // Sample data for display
   const stats = [
@@ -39,7 +58,9 @@ export default function TeacherDashboard() {
       </View>
 
       {/* Welcome */}
-      <Text style={styles.welcomeText}>Welcome back, Teacher!</Text>
+      <Text style={styles.welcomeText}>
+        {user ? `Welcome back, ${user.username}!` : "Welcome back, Teacher!"}
+      </Text>
 
       {/* Stats */}
       <View style={styles.statsContainer}>
