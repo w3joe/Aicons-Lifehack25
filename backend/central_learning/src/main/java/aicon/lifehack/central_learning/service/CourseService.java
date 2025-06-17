@@ -115,29 +115,29 @@ public class CourseService {
 
     // --- GET CURRENT LESSONS FOR USER BASE ON DIFFICULTY ---
     public CurrentLessonDTO getCurrentLessonForUser(String userId, String courseId) throws ExecutionException, InterruptedException {
-        // 1. Get the user's progress
+        // 1. Get the user's progress (this logic is unchanged)
         ProgressTracker tracker = progressTrackerService.getOrCreateTracker(userId, courseId);
         int currentLessonNumber = tracker.getCurrent_lesson_number();
         Difficulty currentDifficulty = tracker.getCurrent_difficulty();
 
-        // 2. Find the lesson with the correct lesson number for the course
+        // 2. Find the lesson (this logic is unchanged)
         Lesson currentLesson = lessonService.getLessonsByCourse(courseId).stream()
                 .filter(lesson -> lesson.getLesson_number() == currentLessonNumber)
                 .findFirst()
                 .orElse(null);
 
         if (currentLesson == null) {
-            // This could mean the user has completed the course
-            return null; 
+            return null;
         }
 
-        // 3. Find all resources for that lesson, filtered by the user's difficulty
-        List<Resource> lessonResources = resourceService.getResourcesByLesson(currentLesson.getLesson_id()).stream()
+        // 3. --- THIS IS THE KEY LOGIC CHANGE ---
+        // Find the single resource for that lesson that matches the user's difficulty.
+        Resource lessonResource = resourceService.getResourcesByLesson(currentLesson.getLesson_id()).stream()
                 .filter(resource -> resource.getDifficulty() == currentDifficulty)
-                .collect(Collectors.toList());
+                .findFirst() // Get the first (and only) match
+                .orElse(null); // If no matching resource is found, return null
 
-        // 4. Find the quiz for that lesson, if any, that matches the user's difficulty
-        // This assumes a lesson has a quizId that points to a quiz document.
+        // 4. Find the quiz (this logic is unchanged as it already finds a single quiz)
         Quiz lessonQuiz = null;
         if (currentLesson.getQuiz_id() != null && !currentLesson.getQuiz_id().isEmpty()) {
             Quiz potentialQuiz = quizService.getQuiz(currentLesson.getQuiz_id());
@@ -146,10 +146,10 @@ public class CourseService {
             }
         }
 
-        // 5. Assemble and return the DTO
+        // 5. Assemble and return the DTO with the new structure
         CurrentLessonDTO dto = new CurrentLessonDTO();
         dto.setLessonDetails(currentLesson);
-        dto.setResources(lessonResources);
+        dto.setResource(lessonResource); // Set the single resource object
         dto.setQuiz(lessonQuiz);
         
         return dto;

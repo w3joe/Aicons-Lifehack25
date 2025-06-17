@@ -71,30 +71,27 @@ public class StudentProgressService {
     }
 
     public CurrentLessonDTO getReviewLessonData(String userId, String lessonId) throws ExecutionException, InterruptedException {
-        // 1. Get the student's progress record for this specific lesson
+        // 1. Get the student's progress record for this specific lesson (Unchanged)
         StudentProgress progress = getProgressForLesson(userId, lessonId);
-
         if (progress == null) {
-            // This means the user has never attempted this lesson before.
-            // You could either throw an error or return null.
             return null;
         }
-        
         Difficulty reviewDifficulty = progress.getNext_time_difficulty();
 
-        // 2. Fetch the full lesson details
+        // 2. Fetch the full lesson details (Unchanged)
         Lesson lesson = lessonService.getLesson(lessonId);
         if (lesson == null) {
-            // Data integrity issue, the lesson was deleted but progress record remains.
             throw new IllegalStateException("Lesson data not found for a progress record that exists.");
         }
 
-        // 3. Find all resources for that lesson, filtered by the review difficulty
-        List<Resource> lessonResources = resourceService.getResourcesByLesson(lessonId).stream()
+        // 3. --- THIS IS THE KEY LOGIC CHANGE ---
+        // Find the single resource for that lesson that matches the review difficulty.
+        Resource lessonResource = resourceService.getResourcesByLesson(lessonId).stream()
                 .filter(resource -> resource.getDifficulty() == reviewDifficulty)
-                .collect(Collectors.toList());
+                .findFirst() // Get the first (and only) match
+                .orElse(null); // If no matching resource is found, return null
 
-        // 4. Find the quiz for that lesson, if any, that matches the review difficulty
+        // 4. Find the quiz (this logic is unchanged)
         Quiz lessonQuiz = null;
         if (lesson.getQuiz_id() != null && !lesson.getQuiz_id().isEmpty()) {
             Quiz potentialQuiz = quizService.getQuiz(lesson.getQuiz_id());
@@ -103,10 +100,10 @@ public class StudentProgressService {
             }
         }
         
-        // 5. Assemble and return the DTO
+        // 5. Assemble and return the DTO with the new structure
         CurrentLessonDTO dto = new CurrentLessonDTO();
         dto.setLessonDetails(lesson);
-        dto.setResources(lessonResources);
+        dto.setResource(lessonResource); // Set the single resource object
         dto.setQuiz(lessonQuiz);
         
         return dto;
