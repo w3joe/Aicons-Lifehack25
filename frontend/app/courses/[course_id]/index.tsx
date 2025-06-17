@@ -62,6 +62,15 @@ export default function CourseDetailScreen() {
         const topicData = await getTopicById(courseData.body.topic_id);
         setCourse(courseData.body);
         setTopic(topicData.body);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [String(course_id)]);
+
+  useEffect(() => {
+    (async () => {
+      try {
         const progressTracker = {
           user_id: user?.user_id!,
           course_id: course?.course_id!,
@@ -73,7 +82,7 @@ export default function CourseDetailScreen() {
         console.error(err);
       }
     })();
-  }, [String(course_id)]);
+  }, [course?.course_id]);
 
   const router = useRouter();
 
@@ -120,15 +129,16 @@ export default function CourseDetailScreen() {
 
         <Text style={styles.sectionTitle}>About this course</Text>
         <Text style={styles.description}>{course.description}</Text>
+        {/* Button opens current lesson the user is at for this course based on progress tracker */}
         <TouchableOpacity
-          style={styles.quizButton}
+          style={styles.startButton}
           onPress={() =>
             router.push(
-              `../courses/${course_id}/${course?.lessons?.at(0)?.lesson_id}`
+              `../courses/${course_id}/${course?.lessons?.at(progress?.current_lesson_number! - 1)?.lesson_id}`
             )
           }
         >
-          <Text style={styles.quizButtonText}>
+          <Text style={styles.startButtonText}>
             {progress?.current_lesson_number == 1 ? "Start" : "Resume"}
           </Text>
         </TouchableOpacity>
@@ -302,7 +312,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
   },
-  quizButton: {
+  startButton: {
     backgroundColor: "#1976d2",
     padding: 16,
     borderRadius: 8,
@@ -310,7 +320,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
     marginBottom: 16,
   },
-  quizButtonText: {
+  startButtonText: {
     color: "white",
     fontSize: 16,
     fontWeight: "600",

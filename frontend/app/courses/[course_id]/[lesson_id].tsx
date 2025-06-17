@@ -18,8 +18,6 @@ export default function LessonPage() {
   const router = useRouter();
   const { lesson_id } = useLocalSearchParams();
 
-  // Dummy lesson data (replace with real API call)
-
   useEffect(() => {
     (async () => {
       try {
