@@ -6,12 +6,18 @@ import { getUser } from "@/services/userAsyncService";
 import { User } from "@/models/User";
 import { updateProgressTracker } from "@/services/progressTrackerService";
 import { ProgressTracker } from "@/models/ProgressTracker";
+import { getIdFromQuizId } from "@/services/quizService";
+import { getCurrentLessonPackage } from "@/services/lessonService";
+import { LessonPackage } from "@/models/LessonPackage";
 
 export default function ResultScreen() {
   const router = useRouter();
   const { quiz_id, quiz_score, proficiency_score } = useLocalSearchParams();
   const [progressTracker, setProgressTracker] =
     useState<ProgressTracker | null>(null);
+  const [lessonPackage, setLessonPackage] = useState<LessonPackage | null>(
+    null
+  );
 
   const getProficiencyLabel = (score: number) => {
     if (score >= 86) return "Expert";
@@ -44,6 +50,23 @@ export default function ResultScreen() {
   }, []);
 
   useEffect(() => {
+    if (!user) return;
+    const fetchLessonPackage = async () => {
+      try {
+        const ids = await getIdFromQuizId(String(quiz_id));
+        const data = await getCurrentLessonPackage(
+          ids.body.course_id,
+          user.user_id
+        );
+        setLessonPackage(data.body);
+      } catch (err) {
+        console.error("Error fetching lesson package:", err);
+      }
+    };
+    fetchLessonPackage();
+  }, [user]);
+
+  useEffect(() => {
     (async () => {
       try {
         const studentProgressData = {
@@ -52,10 +75,10 @@ export default function ResultScreen() {
           quiz_score: Number(quiz_score),
           latest_proficiency_score: Number(proficiency_score),
         };
-        console.log(studentProgressData)
+        console.log(studentProgressData);
         const response: ProgressTracker =
           await updateProgressTracker(studentProgressData);
-          
+
         setProgressTracker(response);
       } catch (err) {
         console.error(err);
@@ -80,29 +103,20 @@ export default function ResultScreen() {
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
-        {Number(proficiency_score) <= 33 ? (
-          <TouchableOpacity
-            style={styles.button}
-            //   onPress={() =>
-            //     router.push(
-            //       `/courses/5D4cR7rnYtNQNHIyfU5A/${course?.lessons?.at(progressTracker?.current_lesson_number! - 1)?.lesson_id}`
-            //     )
-            //   }
-          >
-            <Text style={styles.buttonText}>Restart Lesson</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={styles.button}
-            //   onPress={() =>
-            //     router.push(
-            //       `/courses/5D4cR7rnYtNQNHIyfU5A/${course?.lessons?.at(progressTracker?.current_lesson_number! - 1)?.lesson_id}`
-            //     )
-            //   }
-          >
-            <Text style={styles.buttonText}>Continue to Next Lesson</Text>
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            router.push(
+              `/courses/${lessonPackage?.lessonDetails.course_id}/${lessonPackage?.lessonDetails.lesson_id}`
+            )
+          }
+        >
+          <Text style={styles.buttonText}>
+            {Number(proficiency_score) <= 33
+              ? "Restart Lesson"
+              : "Continue to Next Lesson"}
+          </Text>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}

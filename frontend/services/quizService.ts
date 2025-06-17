@@ -10,3 +10,13 @@ export const getQuizWithQuestions = async (quizId: string) => {
     throw error;
   }
 };
+
+export const getIdFromQuizId = async (quizId: string) => {
+  try {
+    const response = await api.get(`/quizzes/${quizId}/context`);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch Ids:', error);
+    throw error;
+  }
+};

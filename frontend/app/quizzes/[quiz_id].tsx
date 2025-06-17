@@ -141,7 +141,8 @@ export default function QuizScreen() {
             {isCorrect
               ? "✅ Correct!"
               : `❌ Incorrect. Correct Answer: ${question?.correct_answer}
-${question?.explanation}
+
+Explanation: ${question?.explanation}
                 `}
           </Text>
         )}
