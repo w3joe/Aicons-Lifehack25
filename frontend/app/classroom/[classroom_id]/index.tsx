@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView, Text, View, StyleSheet, TouchableOpacity } from "react-native";
-import api from "../../api/api";
+import api from "../../../api/api";
 
 export default function ClassroomPage() {
   const { classroom_id } = useLocalSearchParams(); // dynamic route: [id].tsx
@@ -37,12 +37,13 @@ export default function ClassroomPage() {
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.backButton}>← Back</Text>
+      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+        <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
 
       {/* Students Section */}
       <Text style={styles.title}>Students in Class</Text>
+      
       {students.length > 0 ? (
         students.map((student: any) => (
           <View key={student.user_id} style={styles.studentCard}>
@@ -53,6 +54,9 @@ export default function ClassroomPage() {
       ) : (
         <Text>No students found in this class.</Text>
       )}
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push(`/classroom/${[classroom_id]}/addstudent`)}>
+        <Text style={styles.addButtonText}>+ Add New Student</Text>
+      </TouchableOpacity>
 
       {/* Courses Section */}
       <Text style={[styles.title, { marginTop: 30 }]}>Class Courses</Text>
@@ -67,7 +71,7 @@ export default function ClassroomPage() {
         <Text>No courses found for this class.</Text>
       )}
       {/* Add Course Button */}
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addcourse")}>
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push(`/classroom/${[classroom_id]}/addcourse`)}>
         <Text style={styles.addButtonText}>+ Add New Course</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -75,8 +79,7 @@ export default function ClassroomPage() {
 }
 
 const styles = StyleSheet.create({
-  container: { padding: 20 },
-  backButton: { fontSize: 16, color: "#007AFF", marginBottom: 10 },
+  container: { padding: 20, backgroundColor: "lightblue"},
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 20 },
   studentCard: {
     padding: 15,
@@ -94,6 +97,19 @@ const styles = StyleSheet.create({
   },
   courseTitle: { fontSize: 16, fontWeight: "600", color: "#2d3436" },
   courseDetail: { fontSize: 14, color: "#636e72" },
+
+  backButton: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: "#007AFF",
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 16,
+  },
   
   addButton: {
     marginTop: 25,

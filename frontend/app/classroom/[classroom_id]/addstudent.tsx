@@ -9,13 +9,12 @@ import {
   Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../api/api';
+import api from '../../../api/api';
 import { useRouter } from 'expo-router';
-import { User } from '../models/User';
+import { User } from '../../../models/User';
 
 export default function CreateClassroom() {
   const [name, setName] = useState('');
-  const [grade, setGrade] = useState('');
   const router = useRouter();
 
   const showAlert = (title: string, message: string) => {
@@ -28,7 +27,7 @@ export default function CreateClassroom() {
 
   const handleCreateClassroom = async () => {
     if (!name) {
-      showAlert('Missing Fields', 'Please enter student ID.');
+      showAlert('Missing Fields', 'Please enter classroom name.');
       return;
     }
 
@@ -66,7 +65,7 @@ export default function CreateClassroom() {
         onChangeText={setName}
       />
 
-      <Button title="Create Classroom" onPress={handleCreateClassroom} />
+      <Button title="Add Student" onPress={handleCreateClassroom} />
     </View>
   );
 }

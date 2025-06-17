@@ -10,26 +10,25 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import api from '../api/api';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import api from '../../../api/api';
 import { Picker } from '@react-native-picker/picker';
-import { User } from "../models/User";
+import { User } from "../../../models/User";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Course } from '../models/Course'
+import { Course } from '../../../models/Course'
 
 export default function CreateCourse() {
   const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
   const [description, setDescription] = useState('');
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState('');
   const [loadingTopics, setLoadingTopics] = useState(false);
+  const { classroom_id } = useLocalSearchParams(); // dynamic route: [id].tsx
+  
 
   const [classrooms, setClassrooms] = useState([]);
   const [selectedClassroom, setSelectedClassroom] = useState('');
   const [loadingClassrooms, setLoadingClassrooms] = useState(false);
-
-  const [createdCourse, setCourse] = useState<Course[]>([]);
   
   const router = useRouter();
 
@@ -72,7 +71,7 @@ export default function CreateCourse() {
   }, []);
 
   const handleCreate = async () => {
-    if (!title || !author || !selectedTopic || !selectedClassroom) {
+    if (!title || !selectedTopic) {
       showAlert('Error', 'All fields are required.');
       return;
     }
@@ -91,18 +90,18 @@ export default function CreateCourse() {
         user_id: teacherId,
         topic_id: selectedTopic,
         title: title,
-        author: author,
+        author: user.username,
         description: description,
       });
 
       const course_id = response.data.course_id;
 
-      await api.put(`/classrooms/${selectedClassroom}/assign-course`, {
+      await api.put(`/classrooms/${classroom_id}/assign-course`, {
         course_id: course_id
       });
 
       showAlert('Success', 'Course created!');
-      router.replace('../classroom/teacher');
+      router.replace('../teacher');
     } catch (error: any) {
       console.error('API error response:', error.response?.data);
       showAlert('Error', error?.response?.data?.message || 'Failed to create course');
@@ -129,12 +128,6 @@ export default function CreateCourse() {
       />
       <TextInput
         style={styles.input}
-        placeholder="Author"
-        value={author}
-        onChangeText={setAuthor}
-      />
-      <TextInput
-        style={styles.input}
         placeholder="Description"
         value={description}
         onChangeText={setDescription}
@@ -153,27 +146,6 @@ export default function CreateCourse() {
           <Picker.Item label="Select a topic..." value="" />
           {topics.map((topic: any) => (
             <Picker.Item key={topic.topic_id} label={topic.name} value={topic.topic_id} />
-          ))}
-        </Picker>
-      )}
-
-      {/* Classroom Picker */}
-      <Text style={styles.label}>Select Classroom</Text>
-      {loadingClassrooms ? (
-        <ActivityIndicator size="large" color="#000" />
-      ) : (
-        <Picker
-          selectedValue={selectedClassroom}
-          onValueChange={(itemValue) => setSelectedClassroom(itemValue)}
-          style={styles.picker}
-        >
-          <Picker.Item label="Select a classroom..." value="" />
-          {classrooms.map((classroom: any) => (
-            <Picker.Item
-              key={classroom.classroom_id}
-              label={classroom.name}
-              value={classroom.classroom_id}
-            />
           ))}
         </Picker>
       )}
