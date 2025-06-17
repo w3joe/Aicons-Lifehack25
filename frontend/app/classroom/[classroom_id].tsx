@@ -5,21 +5,34 @@ import { ScrollView, Text, View, StyleSheet, TouchableOpacity } from "react-nati
 import api from "../../api/api";
 
 export default function ClassroomPage() {
-  const { classroom_id } = useLocalSearchParams(); // this is classroom_id
+  const { classroom_id } = useLocalSearchParams(); // dynamic route: [id].tsx
   const router = useRouter();
   const [students, setStudents] = useState([]);
+  const [courses, setCourses] = useState([]);
 
   useEffect(() => {
     const fetchStudents = async () => {
       try {
         const response = await api.get(`/classrooms/${classroom_id}/students`);
-        setStudents(response.data);
+        setStudents(response.data.body);
       } catch (error) {
         console.error("Error fetching students:", error);
       }
     };
 
-    fetchStudents();
+    const fetchCourses = async () => {
+      try {
+        const response = await api.get(`/classrooms/${classroom_id}/courses`);
+        setCourses(response.data.body);
+      } catch (error) {
+        console.error("Error fetching courses:", error);
+      }
+    };
+
+    if (classroom_id) {
+      fetchStudents();
+      fetchCourses();
+    }
   }, [classroom_id]);
 
   return (
@@ -28,6 +41,7 @@ export default function ClassroomPage() {
         <Text style={styles.backButton}>← Back</Text>
       </TouchableOpacity>
 
+      {/* Students Section */}
       <Text style={styles.title}>Students in Class</Text>
       {students.length > 0 ? (
         students.map((student: any) => (
@@ -39,6 +53,23 @@ export default function ClassroomPage() {
       ) : (
         <Text>No students found in this class.</Text>
       )}
+
+      {/* Courses Section */}
+      <Text style={[styles.title, { marginTop: 30 }]}>Class Courses</Text>
+      {courses.length > 0 ? (
+        courses.map((course: any) => (
+          <View key={course.course_id} style={styles.courseCard}>
+            <Text style={styles.courseTitle}>{course.title}</Text>
+            <Text style={styles.courseDetail}>Description: {course.description}</Text>
+          </View>
+        ))
+      ) : (
+        <Text>No courses found for this class.</Text>
+      )}
+      {/* Add Course Button */}
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addcourse")}>
+        <Text style={styles.addButtonText}>+ Add New Course</Text>
+      </TouchableOpacity>
     </ScrollView>
   );
 }
@@ -55,4 +86,25 @@ const styles = StyleSheet.create({
   },
   studentName: { fontSize: 16, fontWeight: "600" },
   studentEmail: { fontSize: 14, color: "#666" },
+  courseCard: {
+    padding: 15,
+    backgroundColor: "#dfe6e9",
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  courseTitle: { fontSize: 16, fontWeight: "600", color: "#2d3436" },
+  courseDetail: { fontSize: 14, color: "#636e72" },
+  
+  addButton: {
+    marginTop: 25,
+    backgroundColor: "#2a9d8f",
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  addButtonText: {
+    color: "#fff",
+    fontWeight: "700",
+    fontSize: 16,
+  },
 });

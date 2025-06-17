@@ -72,7 +72,7 @@ export default function TeacherDashboard() {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Text style={styles.backButtonText} onPress={() => router.back()}>← Back</Text>
+          <Text style={styles.backButtonText} onPress={() => router.push('/')}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Teacher's Dashboard</Text>
       </View>
@@ -92,7 +92,7 @@ export default function TeacherDashboard() {
         ))}
       </View>
 
-      {/* Courses List */}
+      {/* Classroom List */}
       <Text style={styles.sectionTitle}>My Classrooms</Text>
       <View>
       {classrooms.map((classroom) => (
@@ -104,9 +104,9 @@ export default function TeacherDashboard() {
       ))}
       </View>
 
-      {/* Add Course Button */}
-      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addcourse")}>
-        <Text style={styles.addButtonText}>+ Add New Course</Text>
+      {/* Add Classroom Button */}
+      <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addclassroom")}>
+        <Text style={styles.addButtonText}>+ Add New Classroom</Text>
       </TouchableOpacity>
     </ScrollView>
   );
