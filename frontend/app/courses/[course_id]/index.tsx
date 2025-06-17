@@ -14,7 +14,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { Course } from "@/models/Course";
 import { Topic } from "@/models/Topic";
 import { getTopicById } from "@/services/topicService";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUser } from "@/services/userAsyncService";
 import { User } from "@/models/User";
 import { createProgressTracker } from "@/services/progressTrackerService";
 import { ProgressTracker } from "@/models/ProgressTracker";
@@ -29,20 +29,6 @@ export default function CourseDetailScreen() {
   const [expandedLessonIndex, setExpandedLessonIndex] = useState<number | null>(
     null
   );
-
-  const getUser = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("user");
-      if (jsonValue != null) {
-        const user = JSON.parse(jsonValue);
-        return user;
-      }
-      return null;
-    } catch (e) {
-      console.error("Error retrieving user from storage:", e);
-      return null;
-    }
-  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -160,6 +146,13 @@ export default function CourseDetailScreen() {
                 <Text style={styles.lessonTitle}>{lesson.title}</Text>
                 <Text style={styles.lessonDuration}>{lesson.time_taken}</Text>
               </View>
+              {/* Green tick icon */}
+              {index + 1 < progress?.current_lesson_number! && (
+                <Ionicons name="checkmark-circle" size={24} color="green" />
+              )}
+              {index + 1 === progress?.current_lesson_number! && (
+                <Ionicons name="play-circle" size={24} color="dodgerblue" />
+              )}
             </TouchableOpacity>
 
             {expandedLessonIndex === index && (

@@ -69,8 +69,8 @@ export default function LessonPage() {
 
         <TouchableOpacity
           style={styles.quizButton}
-          // onPress={() => router.push(`/quizzes/${lesson.quiz_id}`)}
-          onPress={() => router.push(`/quizzes/rand`)}
+          onPress={() => router.push(`/quizzes/${lesson.quiz_id}`)}
+          // onPress={() => router.push(`/quizzes/rand`)}
         >
           <Text style={styles.quizButtonText}>Take Quiz</Text>
         </TouchableOpacity>
