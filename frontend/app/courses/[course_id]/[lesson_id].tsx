@@ -46,7 +46,6 @@ export default function LessonPage() {
       try {
         const lessonId = lesson_id as string;
         let data;
-
         if (reattempt === "1") {
           data = await getAttemptedLessonPackage(lessonId, user.user_id);
         } else {
@@ -106,15 +105,27 @@ export default function LessonPage() {
         <Text style={styles.description}>
           {lessonPackage.lessonDetails.description}
         </Text>
-
-        <TouchableOpacity
-          style={styles.quizButton}
-          onPress={() =>
-            router.push(`/quizzes/${lessonPackage.lessonDetails.quiz_id}`)
-          }
-        >
-          <Text style={styles.quizButtonText}>Take Quiz</Text>
-        </TouchableOpacity>
+        <View style={styles.btnContainer}>
+          <TouchableOpacity
+            style={styles.quizButton}
+            onPress={() =>
+              // router.push(
+              //   `/ask-aitutor/${lessonPackage.resources?.resource_id}`
+              // )
+              router.push(`/ask-aitutor/123`)
+            }
+          >
+            <Text style={styles.quizButtonText}>Ask Aitutor</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.quizButton}
+            onPress={() =>
+              router.push(`/quizzes/${lessonPackage.lessonDetails.quiz_id}`)
+            }
+          >
+            <Text style={styles.quizButtonText}>Take Quiz</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </ScrollView>
   );
@@ -170,6 +181,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#555",
     marginVertical: 16,
+  },
+  btnContainer: {
+    gap: 20, // Only works in RN 0.71+
   },
   quizButton: {
     backgroundColor: "#1976d2",
