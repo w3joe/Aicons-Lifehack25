@@ -82,7 +82,7 @@ export default function TeacherDashboard() {
         {user ? `Welcome back, ${user.username}!` : "Welcome back, Teacher!"}
       </Text>
 
-      {/* Stats */}
+      {/* Stats 
       <View style={styles.statsContainer}>
         {stats.map((stat) => (
           <View key={stat.label} style={styles.statCard}>
@@ -90,7 +90,7 @@ export default function TeacherDashboard() {
             <Text style={styles.statLabel}>{stat.label}</Text>
           </View>
         ))}
-      </View>
+      </View> */}
 
       {/* Classroom List */}
       <Text style={styles.sectionTitle}>My Classrooms</Text>

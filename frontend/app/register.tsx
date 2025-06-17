@@ -9,6 +9,7 @@ export default function RegisterScreen() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [isTeacher, setIsTeacher] = useState(false);
 
     const showAlert = (title: string, message: string) => {
         if (Platform.OS === 'web') {
@@ -26,11 +27,12 @@ export default function RegisterScreen() {
 
     // TODO: Add real authentication logic here
     else { 
-        try {
-      const response = await api.post('http://localhost:8080/api/users', {
+      try {
+      const response = await api.post('/users', {
         username,
         email,
         password,
+        role: isTeacher ? "TEACHER" : "STUDENT",
       });
 
       if (response.status === 201) {
@@ -80,6 +82,16 @@ export default function RegisterScreen() {
                 secureTextEntry
                 onChangeText={setPassword}
               />
+
+              <View style={styles.checkboxContainer}>
+                <TouchableOpacity
+                  onPress={() => setIsTeacher(!isTeacher)}
+                  style={styles.checkbox}
+                >
+                  <Text style={styles.checkboxText}>{isTeacher ? "☑" : "☐"}</Text>
+                </TouchableOpacity>
+                <Text style={styles.checkboxLabel}>Registering as a Teacher</Text>
+              </View>
         
               <TouchableOpacity style={styles.loginButton} onPress={handleLogin} >
                 <Text style={styles.backButtonText}>Register</Text>
@@ -158,5 +170,19 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     marginBottom: 20,
     marginLeft: 10,
+  },
+  checkboxContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 20,
+  },
+  checkbox: {
+  marginRight: 8,
+  },
+  checkboxText: {
+  fontSize: 20,
+  },
+  checkboxLabel: {
+  fontSize: 16,
   },
 });

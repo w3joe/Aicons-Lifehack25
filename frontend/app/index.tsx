@@ -176,6 +176,15 @@ export default function Home() {
         </TouchableOpacity>
         )}
 
+        {/* Add the Profile Button here */}
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={() => router.push("../user/profile")}
+        >
+          <Text style={styles.profileButtonText}>Profile</Text>
+        </TouchableOpacity>
+
+
         <TouchableOpacity
           style={styles.loginButton}
           onPress={handleLoginLogout}
@@ -280,6 +289,17 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 14,
+  },
+   profileButton: {
+    backgroundColor: "#007BFF",
+    padding: 10,
+    borderRadius: 5,
+    marginLeft: 'auto'  
+  },
+  profileButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   loginButton: {
     backgroundColor: "#007AFF",

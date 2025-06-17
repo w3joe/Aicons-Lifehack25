@@ -10,11 +10,12 @@ import {
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../../../api/api';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { User } from '../../../models/User';
 
 export default function CreateClassroom() {
-  const [name, setName] = useState('');
+  const { classroom_id } = useLocalSearchParams(); // dynamic route: [id].tsx
+  const [studentID, setStudentID] = useState('');
   const router = useRouter();
 
   const showAlert = (title: string, message: string) => {
@@ -26,7 +27,7 @@ export default function CreateClassroom() {
   };
 
   const handleCreateClassroom = async () => {
-    if (!name) {
+    if (!studentID) {
       showAlert('Missing Fields', 'Please enter classroom name.');
       return;
     }
@@ -41,12 +42,11 @@ export default function CreateClassroom() {
       const user: User = JSON.parse(userString);
       const teacherId = user.user_id;
 
-      await api.post('/classrooms', {
-        name: name,
-        teacher_id: teacherId,
+      await api.post(`/classrooms/${classroom_id}/assign-student`, {
+        student_id: studentID,
       });
 
-      showAlert('Success', 'Classroom created successfully!');
+      showAlert('Success', 'Student added successfully!');
       router.replace('/classroom/teacher');
     } catch (error: any) {
       console.error(error);
@@ -56,13 +56,13 @@ export default function CreateClassroom() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Create a New Classroom</Text>
+      <Text style={styles.title}>Add Student ID</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Classroom Name (e.g., 1E2)"
-        value={name}
-        onChangeText={setName}
+        placeholder="Student ID"
+        value={studentID}
+        onChangeText={setStudentID}
       />
 
       <Button title="Add Student" onPress={handleCreateClassroom} />

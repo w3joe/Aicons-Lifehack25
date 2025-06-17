@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
+  TextInput
 } from "react-native";
 import api from "../../api/api";
 
@@ -23,6 +24,11 @@ export default function CoursesScreen() {
   };
 
   const [courses, setCourses] = useState<Course[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredCourses = courses.filter(course =>
+    `${course.name} ${course.author}`.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     fetchAllCourses();
@@ -77,7 +83,14 @@ export default function CoursesScreen() {
 
       <Text style={styles.header}>All Courses</Text>
 
-      {courses.map((course) => (
+      <TextInput
+        style={styles.searchInput}
+        placeholder="Search courses..."
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+
+      {filteredCourses.map((course) => (
         <TouchableOpacity
           key={course.id}
           style={styles.courseCard}
@@ -142,4 +155,15 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "500",
   },
+
+  searchInput: {
+  backgroundColor: "#fff",
+  borderRadius: 10,
+  paddingHorizontal: 12,
+  paddingVertical: 10,
+  fontSize: 16,
+  marginBottom: 20,
+  borderColor: "#ccc",
+  borderWidth: 1,
+},
 });
