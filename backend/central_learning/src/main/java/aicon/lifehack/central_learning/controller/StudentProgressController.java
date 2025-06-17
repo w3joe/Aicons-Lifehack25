@@ -45,7 +45,7 @@ public class StudentProgressController {
         CurrentLessonDTO reviewData = studentProgressService.getReviewLessonData(userId, lessonId);
 
         if (reviewData != null) {
-            return ResponseEntity.ok(reviewData);
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(reviewData)); // 200 OK
         } else {
             // This means the user has never attempted the lesson, so there's nothing to review.
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(((BodyBuilder) ResponseEntity.notFound()).body("No progress found for user '" + userId + "' on lesson '" + lessonId + "'."));
@@ -54,12 +54,12 @@ public class StudentProgressController {
     }
 
     @PutMapping("/retake")
-    public ResponseEntity<StudentProgress> retakeQuiz(@RequestBody RetakeQuizRequestDTO request) 
+    public ResponseEntity<?> retakeQuiz(@RequestBody RetakeQuizRequestDTO request) 
             throws ExecutionException, InterruptedException {
         
         // Basic validation
         if (request.getUser_id() == null || request.getLesson_id() == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ResponseEntity.badRequest().body("userid or lessonid null"));
         }
         
         StudentProgress updatedProgress = studentProgressService.retakeQuiz(
@@ -69,7 +69,7 @@ public class StudentProgressController {
             request.getQuiz_score()
         );
 
-        return ResponseEntity.ok(updatedProgress);
+            return ResponseEntity.status(HttpStatus.OK).body(ResponseEntity.ok().body(updatedProgress)); // 200 OK
     }
 
 }
