@@ -19,10 +19,12 @@ import { User } from "@/models/User";
 import { createProgressTracker } from "@/services/progressTrackerService";
 import { ProgressTracker } from "@/models/ProgressTracker";
 import { useLocalSearchParams } from "expo-router/build/hooks";
+import { Lesson } from "@/models/Lesson";
 
 export default function CourseDetailScreen() {
   const { course_id } = useLocalSearchParams();
   const [course, setCourse] = useState<Course | null>(null);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [progress, setProgress] = useState<ProgressTracker | null>(null);
@@ -76,6 +78,16 @@ export default function CourseDetailScreen() {
     router.back();
   };
 
+  useEffect(() => {
+    if (course?.lessons) {
+      const sortedLessons = [...course.lessons].sort(
+        (a, b) => a.lesson_number - b.lesson_number
+      );
+      setLessons(sortedLessons);
+      console.log("Sorted lessons:", sortedLessons);
+    }
+  }, [course]);
+
   if (!course)
     return (
       <View style={styles.loadingContainer}>
@@ -124,9 +136,12 @@ export default function CourseDetailScreen() {
           <TouchableOpacity
             style={styles.startButton}
             onPress={() =>
-              router.push(
-                `../courses/${course_id}/${course?.lessons?.at(progress?.current_lesson_number! - 1)?.lesson_id}`
-              )
+              router.push({
+                pathname: `../courses/${course_id}/${lessons!.at(progress?.current_lesson_number! - 1)?.lesson_id}`,
+                params: {
+                  reattempt: 0,
+                },
+              })
             }
           >
             <Text style={styles.startButtonText}>
@@ -136,7 +151,7 @@ export default function CourseDetailScreen() {
         )}
 
         <Text style={styles.sectionTitle}>Curriculum</Text>
-        {course?.lessons?.map((lesson, index) => (
+        {lessons?.map((lesson, index) => (
           <View key={lesson.lesson_id} style={styles.lessonItemContainer}>
             <TouchableOpacity
               onPress={() =>
@@ -210,7 +225,12 @@ export default function CourseDetailScreen() {
                   <TouchableOpacity
                     style={styles.startButton}
                     onPress={() =>
-                      router.push(`../courses/${course_id}/${lesson.lesson_id}`)
+                      router.push({
+                        pathname: `../courses/${course_id}/${lesson.lesson_id}`,
+                        params: {
+                          reattempt: 1,
+                        },
+                      })
                     }
                   >
                     <Text style={styles.startButtonText}>Retake Lesson</Text>
@@ -220,7 +240,12 @@ export default function CourseDetailScreen() {
                   <TouchableOpacity
                     style={styles.startButton}
                     onPress={() =>
-                      router.push(`../courses/${course_id}/${lesson.lesson_id}`)
+                      router.push({
+                        pathname: `../courses/${course_id}/${lesson.lesson_id}`,
+                        params: {
+                          reattempt: 0,
+                        },
+                      })
                     }
                   >
                     <Text style={styles.startButtonText}>Resume Lesson</Text>

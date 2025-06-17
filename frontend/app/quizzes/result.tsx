@@ -14,16 +14,16 @@ export default function ResultScreen() {
     useState<ProgressTracker | null>(null);
 
   const getProficiencyLabel = (score: number) => {
-    if (score >= 0.77) return "Expert";
-    if (score >= 0.4) return "Proficient";
-    if (score >= 0.3) return "Intermediate";
-    return "Beginner";
+    if (score >= 86) return "Expert";
+    if (score >= 66) return "Intermediate";
+    if (score >= 33) return "Beginner";
+    return "Try Again";
   };
 
   const getColor = (score: number) => {
-    if (score >= 0.9) return "#4caf50";
-    if (score >= 0.7) return "#8bc34a";
-    if (score >= 0.5) return "#ffc107";
+    if (score >= 86) return "#4caf50";
+    if (score >= 66) return "#8bc34a";
+    if (score >= 33) return "#ffc107";
     return "#f44336";
   };
 
@@ -78,16 +78,29 @@ export default function ResultScreen() {
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
-          style={styles.button}
-          //   onPress={() =>
-          //     router.push(
-          //       `/courses/5D4cR7rnYtNQNHIyfU5A/${course?.lessons?.at(progressTracker?.current_lesson_number! - 1)?.lesson_id}`
-          //     )
-          //   }
-        >
-          <Text style={styles.buttonText}>Continue to Next Lesson</Text>
-        </TouchableOpacity>
+        {Number(proficiency_score) <= 33 ? (
+          <TouchableOpacity
+            style={styles.button}
+            //   onPress={() =>
+            //     router.push(
+            //       `/courses/5D4cR7rnYtNQNHIyfU5A/${course?.lessons?.at(progressTracker?.current_lesson_number! - 1)?.lesson_id}`
+            //     )
+            //   }
+          >
+            <Text style={styles.buttonText}>Restart Lesson</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.button}
+            //   onPress={() =>
+            //     router.push(
+            //       `/courses/5D4cR7rnYtNQNHIyfU5A/${course?.lessons?.at(progressTracker?.current_lesson_number! - 1)?.lesson_id}`
+            //     )
+            //   }
+          >
+            <Text style={styles.buttonText}>Continue to Next Lesson</Text>
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}

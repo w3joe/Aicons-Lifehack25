@@ -10,37 +10,69 @@ import {
 import Video from "react-native-video";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Lesson } from "@/models/Lesson";
-import { getLessonById } from "@/services/lessonService";
+import {
+  getAttemptedLessonPackage,
+  getCurrentLessonPackage,
+  getLessonById,
+} from "@/services/lessonService";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
 import { getResourceByLessonId } from "@/services/resourceService";
 import { Resource } from "@/models/Resource";
+import { LessonPackage } from "@/models/LessonPackage";
+import { User } from "@/models/User";
+import { getUser } from "@/services/userAsyncService";
 
 export default function LessonPage() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [resource, setResource] = useState<Resource | null>(null);
+  const [lessonPackage, setLessonPackage] = useState<LessonPackage | null>(
+    null
+  );
+
   const router = useRouter();
-  const { lesson_id } = useLocalSearchParams();
+  const { lesson_id, reattempt } = useLocalSearchParams();
+  useEffect(() => {
+    const fetchUser = async () => {
+      const storedUser = await getUser();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     (async () => {
       try {
         const lessonId = lesson_id as string;
-        console.log(lessonId)
-        const data = await getLessonById(lessonId);
+        let data;
+        console.log(reattempt)
+        if (reattempt == "1")
+          data = await getAttemptedLessonPackage(lessonId, user?.user_id!);
+        else {
+          const lessonData = await getLessonById(lessonId);
+          data = await getCurrentLessonPackage(
+            lessonData.body.course_id,
+            user?.user_id!
+          );
+        }
+        // const data = await getLessonById(lessonId);
         // const resourceData = await getResourceByLessonId(lessonId);
-        setLesson(data.body);
+        setLessonPackage(data.body);
         // setResource(resourceData.body);
       } catch (err) {
         console.error(err);
       }
     })();
-  }, [lesson_id]);
+  }, [lesson_id, user]);
 
   const handleBackPress = () => {
     router.back();
   };
 
-  if (!lesson)
+  if (!lessonPackage)
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#4A90E2" />
@@ -57,24 +89,24 @@ export default function LessonPage() {
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{lesson.title}</Text>
+        <Text style={styles.headerTitle}>{lessonPackage.lessonDetails.title}</Text>
         <View style={{ width: 24 }} />
       </View>
       {/* Course details */}
-      {/* {resource?.resource_type == "VIDEO"} */}
+      {resource?.resource_type == "VIDEO"}
       <View style={styles.content}>
         <Video
-          source={{ uri: lesson.title }}
+          source={{ uri: lessonPackage.resources?.url_or_content}}
           style={styles.video}
           controls
           resizeMode="contain"
         />
 
-        <Text style={styles.description}>{lesson.description}</Text>
+        <Text style={styles.description}>{lessonPackage.lessonDetails.description}</Text>
 
         <TouchableOpacity
           style={styles.quizButton}
-          onPress={() => router.push(`/quizzes/${lesson.quiz_id}`)}
+          onPress={() => router.push(`/quizzes/${lessonPackage.lessonDetails.quiz_id}`)}
         >
           <Text style={styles.quizButtonText}>Take Quiz</Text>
         </TouchableOpacity>
