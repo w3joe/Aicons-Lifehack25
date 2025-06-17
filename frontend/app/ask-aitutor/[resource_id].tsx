@@ -10,62 +10,59 @@ import {
   Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-const messages = [
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-  { id: "1", sender: "bot", text: "Hi there! How can I help you today?" },
-  { id: "2", sender: "user", text: "Tell me about the solar system." },
-  {
-    id: "3",
-    sender: "bot",
-    text: "Sure! The solar system has 8 planets orbiting the Sun.",
-  },
-];
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { Message, Sender } from "@/models/Message";
+import { Query } from "@/models/Query";
+import { askAITutor } from "@/services/aiService";
 
 export default function ChatbotUI() {
+  const router = useRouter();
   const [inputHeight, setInputHeight] = useState(40); // default height
   const MAX_HEIGHT = 200;
+  const { resource_id } = useLocalSearchParams();
+  const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      message_id: 0,
+      sender: Sender.BOT,
+      text: "Hi, I'm AI Tutor, feel free to ask me a question! \nTry to be clear and specific. \n\nFor example:\ \nExplain photosynthesis step by step.\nHow do I solve quadratic equations?\nWhat are tips for improving my writing skills? \n\nThe clearer your question, the better I can help!",
+    },
+  ]);
+  const [loading, setLoading] = useState(false);
+
+  const handleSend = () => {
+    setMessages((messages) => [
+      ...messages,
+      { message_id: messages.length, sender: Sender.USER, text: inputValue },
+    ]);
+    console.log(messages);
+    handleQuestion();
+  };
+
+  const handleQuestion = async () => {
+    try {
+      setLoading(true);
+      const query: Query = {
+        resource_id: String(resource_id),
+        prompt: inputValue,
+      };
+      console.log(query);
+      const result = await askAITutor(query);
+      setMessages((messages) => [
+        ...messages,
+        {
+          message_id: messages.length,
+          sender: Sender.BOT,
+          text: result.body.answer,
+        },
+      ]);
+      setInputValue("");
+    } catch (err) {
+      console.error("Error asking AI Tutor:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -74,13 +71,31 @@ export default function ChatbotUI() {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>AI Chatbot</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Ask a Question</Text>
+        <View style={{ width: 24 }} />
       </View>
 
       {/* Messages */}
       <FlatList
-        data={messages}
-        keyExtractor={(item) => item.id}
+        data={
+          loading
+            ? [
+                ...messages,
+                {
+                  message_id: "loading",
+                  sender: "bot",
+                  text: "AITutor is thinking...",
+                },
+              ]
+            : messages
+        }
+        keyExtractor={(item) => String(item.message_id)}
         renderItem={({ item }) => (
           <View
             style={[
@@ -104,8 +119,11 @@ export default function ChatbotUI() {
       {/* Input */}
       <View style={styles.inputContainer}>
         <TextInput
-          placeholder="Type a message..."
+          value={inputValue}
+          placeholder="Chat with AITutor"
+          placeholderTextColor="#A9A9A9"
           multiline
+          onChangeText={(text) => setInputValue(text)}
           onContentSizeChange={(e) => {
             const height = e.nativeEvent.contentSize.height;
             setInputHeight(Math.min(MAX_HEIGHT, height));
@@ -120,11 +138,11 @@ export default function ChatbotUI() {
         />
 
         <TouchableOpacity
-        //   style={styles.backButton}
-        //   onPress={() => handleBackPress()}
+          onPress={() => handleSend()}
+          disabled={inputValue == ""}
         >
           <Ionicons
-            name="send"
+            name={inputValue == "" ? "send-outline" : "send"}
             size={28}
             color="#333"
             style={styles.sendButton}
@@ -152,13 +170,21 @@ const styles = StyleSheet.create({
     zIndex: -1,
   },
   header: {
-    padding: 16,
-    backgroundColor: "#ffffff",
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#eee",
+    backgroundColor: "#fff",
   },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
+  backButton: {
+    padding: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#333",
   },
   messagesContainer: {
     padding: 16,
