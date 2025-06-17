@@ -94,8 +94,10 @@ export default function CreateCourse() {
         description: description,
       });
 
+      //get course_id after creating
       const course_id = response.data.course_id;
 
+      //get classroom_id from localsearchparams
       await api.put(`/classrooms/${classroom_id}/assign-course`, {
         course_id: course_id
       });

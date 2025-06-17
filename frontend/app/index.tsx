@@ -36,7 +36,6 @@ export default function Home() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
-
   // Check login status on mount
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -193,7 +192,7 @@ export default function Home() {
           {topics.map((topic) => (
             <TouchableOpacity
               key={topic.id}
-              style={styles.subcard}
+              style={[styles.subcard, selectedTopicId === topic.id && styles.selectedButton,]} // make it show a topic is selected
               onPress={() => handleTopicPress(topic.id)}
             >
               <Text style={styles.cardTitle}>{topic.name}</Text>
@@ -341,4 +340,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 10,
   },
+  selectedButton: {
+    backgroundColor: "lightgrey",
+    borderColor: "grey",
+    borderWidth: 1,
+},
 });
