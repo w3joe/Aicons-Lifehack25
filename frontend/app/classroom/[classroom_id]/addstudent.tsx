@@ -42,7 +42,7 @@ export default function CreateClassroom() {
       const user: User = JSON.parse(userString);
       const teacherId = user.user_id;
 
-      await api.post(`/classrooms/${classroom_id}/assign-student`, {
+      await api.put(`/classrooms/${classroom_id}/assign-student`, {
         student_id: studentID,
       });
 
@@ -50,7 +50,7 @@ export default function CreateClassroom() {
       router.replace('/classroom/teacher');
     } catch (error: any) {
       console.error(error);
-      showAlert('Error', error.response?.data?.message || 'Failed to create classroom.');
+      showAlert('Error', error.response?.data?.message || 'Failed to create student.');
     }
   };
 
