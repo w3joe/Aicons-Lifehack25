@@ -14,6 +14,7 @@ public class Course {
     private String description;
     private String author;
     private String user_id;
+    private String thumbnail;
     private Date created_at;
     private int like_count = 0;
     // You could add more fields here later, like 'difficulty', 'imageUrl', etc.
