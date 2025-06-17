@@ -1,30 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Quiz } from "@/models/Quiz";
 import { getQuizWithQuestions } from "@/services/quizService";
-
-const quizData = [
-  {
-    id: "1",
-    question: "What is the capital of France?",
-    options: ["Berlin", "Madrid", "Paris", "Lisbon"],
-    correct_answer: "Paris",
-  },
-  {
-    id: "2",
-    question: "What is 2 + 2?",
-    options: ["3", "4", "5", "22"],
-    correct_answer: "4",
-  },
-  {
-    id: "3",
-    question: "Who wrote Hamlet?",
-    options: ["Shakespeare", "Hemingway", "Tolkien", "Rowling"],
-    correct_answer: "Shakespeare",
-  },
-];
-
 const confidenceLevels = ["No Idea", "Maybe", "I Think So", "Definitely"];
 
 const confidenceLevelsValue: { [key: string]: number } = {
@@ -36,19 +14,20 @@ const confidenceLevelsValue: { [key: string]: number } = {
 
 export default function QuizScreen() {
   const router = useRouter();
+  const { quiz_id } = useLocalSearchParams();
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
-        const data = await getQuizWithQuestions("xcMz4tXgYqFQ5HwsO5bx");
+        const data = await getQuizWithQuestions(String(quiz_id));
         setQuiz(data.body);
       } catch (err) {
         console.error(err);
       }
     })();
-  }, ["xcMz4tXgYqFQ5HwsO5bx"]);
+  }, [String(quiz_id)]);
 
   const [selectedAnswers, setSelectedAnswers] = useState<{
     [key: string]: string;
@@ -89,19 +68,27 @@ export default function QuizScreen() {
   };
 
   const calculateFinalScore = () => {
-    let score = 0,
+    let proficiency_score = 0,
       qnsCount = 0,
-      proficiency = 0;
+      total_quiz_score = 0,
+      total_proficiency_score = 0;
     quiz?.questions!.forEach((q) => {
       if (selectedAnswers[q.question_id] === q.correct_answer) {
-        score += 1 * confidenceLevelsValue[confidenceLevelsPerQ[q.question_id]];
-        qnsCount++;
+        proficiency_score +=
+          1 * confidenceLevelsValue[confidenceLevelsPerQ[q.question_id]];
+        total_quiz_score++;
       }
+      qnsCount++;
     });
-    proficiency = score / qnsCount;
-    
-    window.alert(score);
-    router.back();
+    total_proficiency_score = proficiency_score / qnsCount;
+    router.push({
+      pathname: "../quizzes/result", // or any route file you have
+      params: {
+        quiz_id: quiz_id,
+        quiz_score: total_quiz_score,
+        proficiency_score: total_proficiency_score,
+      },
+    });
   };
 
   const isSubmitted = submittedQuestions[question?.question_id!];
@@ -170,7 +157,7 @@ ${question?.explanation}
               );
             })}
           </View>
-        ) : currentQuestionIndex < quizData.length - 1 ? (
+        ) : currentQuestionIndex < quiz!.questions!.length - 1 ? (
           <TouchableOpacity
             style={styles.navButton}
             onPress={() => setCurrentQuestionIndex((prev) => prev + 1)}
@@ -194,6 +181,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: "lightblue",
   },
   questionContainer: {
     flex: 1,
