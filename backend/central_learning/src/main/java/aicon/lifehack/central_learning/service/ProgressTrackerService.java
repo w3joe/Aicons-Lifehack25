@@ -1,5 +1,6 @@
 package aicon.lifehack.central_learning.service;
 
+import aicon.lifehack.central_learning.dto.SubmitQuizRequestDTO;
 import aicon.lifehack.central_learning.model.Difficulty;
 import aicon.lifehack.central_learning.model.Lesson;
 import aicon.lifehack.central_learning.model.ProgressTracker;
@@ -9,6 +10,10 @@ import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 
@@ -50,6 +55,24 @@ public class ProgressTrackerService {
             trackerRef.set(newTracker).get();
             return newTracker;
         }
+    }
+    public ProgressTracker updateProgressByQuiz(SubmitQuizRequestDTO quizSubmission) 
+        throws ExecutionException, InterruptedException {
+    
+        // 1. Find the lesson associated with this quizId to get the context.
+        Lesson lesson = lessonService.getLessonByQuizId(quizSubmission.getQuiz_id());
+
+        if (lesson == null) {
+            throw new IllegalStateException("No lesson is associated with quiz ID: " + quizSubmission.getQuiz_id());
+        }
+
+        // 2. Now that we have the courseId, we can call our existing update logic.
+        return this.updateProgress(
+            quizSubmission.getUser_id(),
+            lesson.getCourse_id(), 
+            quizSubmission.getProficiency_score(),
+            quizSubmission.getQuiz_score()
+        );
     }
     
     public ProgressTracker updateProgress(String userId, String courseId, double proficiencyScore, double quizScore) throws ExecutionException, InterruptedException {

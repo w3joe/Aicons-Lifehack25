@@ -1,6 +1,7 @@
 package aicon.lifehack.central_learning.controller;
 
 import aicon.lifehack.central_learning.dto.ProgressRequestDTO;
+import aicon.lifehack.central_learning.dto.SubmitQuizRequestDTO; 
 import aicon.lifehack.central_learning.model.ProgressTracker;
 import aicon.lifehack.central_learning.service.ProgressTrackerService;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,19 @@ public class ProgressTrackerController {
         return ResponseEntity.ok(tracker);
     }
 
+    @PutMapping("/submit-quiz")
+    public ResponseEntity<ProgressTracker> submitQuiz(@RequestBody SubmitQuizRequestDTO quizSubmission) 
+            throws ExecutionException, InterruptedException {
+        
+        // Basic validation
+        if (quizSubmission.getUser_id() == null || quizSubmission.getQuiz_id() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+                
+        ProgressTracker updatedTracker = progressTrackerService.updateProgressByQuiz(quizSubmission);
+        return ResponseEntity.ok(updatedTracker);
+    }
+    /* 
     @PutMapping
     public ResponseEntity<ProgressTracker> updateProgress(@RequestBody ProgressRequestDTO request) 
             throws ExecutionException, InterruptedException {
@@ -47,5 +61,5 @@ public class ProgressTrackerController {
             request.getQuiz_score() 
         );
         return ResponseEntity.ok(updatedTracker);
-    }
+    }*/
 }
