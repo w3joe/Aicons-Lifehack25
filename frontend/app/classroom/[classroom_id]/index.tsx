@@ -5,10 +5,12 @@ import { ScrollView, Text, View, StyleSheet, TouchableOpacity } from "react-nati
 import api from "../../../api/api";
 
 export default function ClassroomPage() {
-  const { classroom_id } = useLocalSearchParams(); // dynamic route: [id].tsx
+  const { classroom_id, name } = useLocalSearchParams(); // dynamic route: [id].tsx
   const router = useRouter();
   const [students, setStudents] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [classroomName, setClassroomName] = useState<string>("");
+
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -40,6 +42,20 @@ export default function ClassroomPage() {
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Text style={styles.backButtonText}>← Back</Text>
       </TouchableOpacity>
+
+      <Text style={styles.classroomNameHeader}>{name}</Text>
+
+      {/* Summary Cards */}
+      <View style={styles.summaryContainer}>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryNumber}>{students.length}</Text>
+          <Text style={styles.summaryLabel}>Students</Text>
+        </View>
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryNumber}>{courses.length}</Text>
+          <Text style={styles.summaryLabel}>Courses</Text>
+        </View>
+      </View>
 
       {/* Students Section */}
       <Text style={styles.title}>Students in Class</Text>
@@ -110,17 +126,61 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
-  
+  classroomNameHeader: {
+  fontSize: 32,
+  fontWeight: 'bold',
+  marginTop: 24,
+  marginBottom: 16,
+  color: 'white',
+  backgroundColor: '#2a9d8f',
+  paddingVertical: 12,
+  paddingHorizontal: 20,
+  borderRadius: 10,
+  alignSelf: 'flex-start',
+  },
+  summaryContainer: {
+  flexDirection: "row",
+  justifyContent: "space-between",
+  gap: 12,
+  marginTop: 20,
+  marginBottom: 20,
+},
+summaryCard: {
+  backgroundColor: "#2a9d8f",
+  padding: 20,
+  borderRadius: 12,
+  flex: 1,
+  alignItems: "center",
+  elevation: 3,
+  shadowColor: "#000",
+  shadowOpacity: 0.1,
+  shadowOffset: { width: 0, height: 2 },
+  shadowRadius: 4,
+},
+summaryNumber: {
+  fontSize: 32,
+  fontWeight: "bold",
+  color: "white",
+},
+summaryLabel: {
+  fontSize: 16,
+  color: "white",
+  marginTop: 4,
+},
   addButton: {
-    marginTop: 25,
-    backgroundColor: "#2a9d8f",
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: "center",
-  },
-  addButtonText: {
-    color: "#fff",
-    fontWeight: "700",
-    fontSize: 16,
-  },
+  marginTop: 20,
+  backgroundColor: "#2a9d8f",
+  paddingVertical: 14,
+  paddingHorizontal: 20,
+  borderRadius: 12,
+  alignItems: "center",
+  elevation: 2,
+},
+addButtonText: {
+  color: "#fff",
+  fontWeight: "600",
+  fontSize: 16,
+  textTransform: "uppercase",
+  letterSpacing: 1,
+},
 });

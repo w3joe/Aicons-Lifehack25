@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import {
   Alert,
   ScrollView,
@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
   Platform,
+  Linking,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../api/api";
@@ -176,15 +177,6 @@ export default function Home() {
         </TouchableOpacity>
         )}
 
-        {/* Add the Profile Button here */}
-        <TouchableOpacity
-          style={styles.profileButton}
-          onPress={() => router.push("../user/profile")}
-        >
-          <Text style={styles.profileButtonText}>Profile</Text>
-        </TouchableOpacity>
-
-
         <TouchableOpacity
           style={styles.loginButton}
           onPress={handleLoginLogout}
@@ -244,6 +236,26 @@ export default function Home() {
 
       <View style={styles.titlecard}>
         <Text style={styles.sectionTitle}>Contact Us</Text>
+        <Text style={styles.cardDetail}>Email: support@aitutor.com</Text>
+        <Text style={styles.cardDetail}>Phone: +65 1234 5678</Text>
+        <Text style={styles.cardDetail}>Operating Hours: Mon–Fri, 9am–6pm</Text>
+
+        <TouchableOpacity
+         style={styles.feedbackButton}
+          onPress={() => {
+           const subject = encodeURIComponent("Feedback for AITUTOR");
+            const body = encodeURIComponent("Hi AITUTOR Team,\n\nI'd like to share the following feedback...");
+            const mailtoLink = `mailto:support@aitutor.com?subject=${subject}&body=${body}`;
+
+            if (Platform.OS === "web") {
+              window.location.href = mailtoLink;
+            } else {
+              Linking.openURL(mailtoLink);
+            }
+          }}
+        >
+          <Text style={styles.feedbackButtonText}>Send Feedback</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -309,8 +321,10 @@ const styles = StyleSheet.create({
   },
   loginButtonText: {
     color: "#fff",
-    fontWeight: "bold",
+    fontWeight: "700",
     fontSize: 14,
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
   sectionTitle: {
     fontSize: 24,
@@ -364,5 +378,18 @@ const styles = StyleSheet.create({
     backgroundColor: "lightgrey",
     borderColor: "grey",
     borderWidth: 1,
-},
+  },
+  feedbackButton: {
+  marginTop: 15,
+  backgroundColor: "#2a9d8f",
+  paddingVertical: 12,
+  paddingHorizontal: 18,
+  borderRadius: 8,
+  alignItems: "center",
+  },
+  feedbackButtonText: {
+  color: "#fff",
+  fontSize: 16,
+  fontWeight: "600",
+  },
 });

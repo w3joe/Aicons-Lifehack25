@@ -90,14 +90,14 @@ export default function TeacherDashboard() {
             <Text style={styles.statLabel}>{stat.label}</Text>
           </View>
         ))}
-      </View> */}
+      </View>*/}
 
       {/* Classroom List */}
       <Text style={styles.sectionTitle}>My Classrooms</Text>
       <View>
       {classrooms.map((classroom) => (
         <TouchableOpacity key={classroom.classroom_id} style={styles.courseCard}
-          onPress={() => router.push(`../classroom/${classroom.classroom_id}`)}
+          onPress={() => router.push(`../classroom/${classroom.classroom_id}?name=${encodeURIComponent(classroom.name)}`)}
         >
           <Text style={styles.courseTitle}>{classroom.name}</Text>
         </TouchableOpacity>
@@ -203,5 +203,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "700",
     fontSize: 16,
+    textTransform: "uppercase",
+    letterSpacing: 1,
   },
 });
