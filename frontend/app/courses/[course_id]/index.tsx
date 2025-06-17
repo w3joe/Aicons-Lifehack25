@@ -157,8 +157,10 @@ export default function CourseDetailScreen() {
               {index + 1 < progress?.current_lesson_number! && (
                 <Ionicons name="checkmark-circle" size={24} color="green" />
               )}
-              {index + 1 === progress?.current_lesson_number! && (
+              {index + 1 === progress?.current_lesson_number! ? (
                 <Ionicons name="play-circle" size={24} color="dodgerblue" />
+              ) : (
+                <Ionicons name="lock-closed" size={22} color="lightblue" />
               )}
             </TouchableOpacity>
 
