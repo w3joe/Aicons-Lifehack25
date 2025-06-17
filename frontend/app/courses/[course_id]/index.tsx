@@ -18,8 +18,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { User } from "@/models/User";
 import { createProgressTracker } from "@/services/progressTrackerService";
 import { ProgressTracker } from "@/models/ProgressTracker";
+import { useLocalSearchParams } from "expo-router/build/hooks";
 
-export default function CourseDetailScreen(course_id: string) {
+export default function CourseDetailScreen() {
+  const { course_id } = useLocalSearchParams();
   const [course, setCourse] = useState<Course | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -56,7 +58,7 @@ export default function CourseDetailScreen(course_id: string) {
   useEffect(() => {
     (async () => {
       try {
-        const courseData = await getCourseById("Y9YXDXtGqI9v3btEd7QM");
+        const courseData = await getCourseById(String(course_id));
         const topicData = await getTopicById(courseData.body.topic_id);
         setCourse(courseData.body);
         setTopic(topicData.body);
@@ -66,11 +68,12 @@ export default function CourseDetailScreen(course_id: string) {
         };
         const response = await createProgressTracker(progressTracker);
         setProgress(response);
+        console.log(response);
       } catch (err) {
         console.error(err);
       }
     })();
-  }, ["Y9YXDXtGqI9v3btEd7QM"]);
+  }, [String(course_id)]);
 
   const router = useRouter();
 
@@ -126,7 +129,7 @@ export default function CourseDetailScreen(course_id: string) {
           }
         >
           <Text style={styles.quizButtonText}>
-            {progress?.current_lesson_number == 1 ? "Start":"Resume"}
+            {progress?.current_lesson_number == 1 ? "Start" : "Resume"}
           </Text>
         </TouchableOpacity>
         <Text style={styles.sectionTitle}>Curriculum</Text>

@@ -10,7 +10,7 @@ import {
   Platform,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from '../api/api';
+import api from "../api/api";
 
 export default function Home() {
   type Topic = {
@@ -31,9 +31,8 @@ export default function Home() {
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [topics, setTopics] = useState<Topic[]>([]);
-  const [selectedTopicId, setSelectedTopicId] = useState<string  | null>(null);
+  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
-
 
   // Check login status on mount
   useEffect(() => {
@@ -43,7 +42,6 @@ export default function Home() {
     };
     checkLoginStatus();
   }, []);
-
 
   // Fetch topics from backend on mount
   useEffect(() => {
@@ -73,51 +71,50 @@ export default function Home() {
   }, []);
 
   const fetchAllCourses = async () => {
-  try {
-    const response = await api.get(`/courses`);
-    //const data = await response.json();
-    const data = response.data;
-    const courseArray = Array.isArray(data.body) ? data.body : [];
-    const normalizedCourses: Course[] = courseArray.map((course: any) => ({
-      id: course.course_id,
-      name: course.title,
-      author: course.author,
-      date: course.created_at,
-      topicId: course.topic_id,
-    }));
-    
-    setCourses(normalizedCourses);
-  } catch (error) {
-    console.error("Error fetching all courses:", error);
-    showAlert("Error", "Unable to load all courses.");
-  }
-  };
+    try {
+      const response = await api.get(`/courses`);
+      //const data = await response.json();
+      const data = response.data;
+      const courseArray = Array.isArray(data.body) ? data.body : [];
+      const normalizedCourses: Course[] = courseArray.map((course: any) => ({
+        id: course.course_id,
+        name: course.title,
+        author: course.author,
+        date: course.created_at,
+        topicId: course.topic_id,
+      }));
 
+      setCourses(normalizedCourses);
+    } catch (error) {
+      console.error("Error fetching all courses:", error);
+      showAlert("Error", "Unable to load all courses.");
+    }
+  };
 
   // Filter courses based on selected topic
   const filteredCourses = selectedTopicId
-    ? courses.filter((course) => course.topicId === selectedTopicId) : courses;
+    ? courses.filter((course) => course.topicId === selectedTopicId)
+    : courses;
 
   const fetchCoursesByTopic = async (topicId: string) => {
-  try {
-    const response = await api.get(`/topics/${topicId}/courses`);
-    //const data = await response.json();
-    const data = response.data;
-    const courseArray = Array.isArray(data.body) ? data.body : [];
-    const normalizedCourses: Course[] = courseArray.map((course: any) => ({
-      id: course.course_id,
-      name: course.title,
-      author: course.author,
-      date: course.created_at,
-      topicId: course.topic_id,
-    }));
-    setCourses(normalizedCourses);
+    try {
+      const response = await api.get(`/topics/${topicId}/courses`);
+      //const data = await response.json();
+      const data = response.data;
+      const courseArray = Array.isArray(data.body) ? data.body : [];
+      const normalizedCourses: Course[] = courseArray.map((course: any) => ({
+        id: course.course_id,
+        name: course.title,
+        author: course.author,
+        date: course.created_at,
+        topicId: course.topic_id,
+      }));
+      setCourses(normalizedCourses);
     } catch (error) {
       console.error("Error fetching courses for topic:", error);
       showAlert("Error", "Unable to load courses for selected topic.");
     }
   };
-
 
   // Check if user is logged in
   const handleLoginLogout = async () => {
@@ -131,19 +128,20 @@ export default function Home() {
     }
   };
 
-
   // Directs to all courses page
   const handleSeeMore = () => {
     router.push("/courses");
   };
 
+  const handleCoursePressed = (course_id: string) => {
+    router.push(`/courses/${course_id}`);
+  };
 
   // Make Topic ID == selected ID & filter courses based on selected ID
   const handleTopicPress = (topicId: string) => {
     setSelectedTopicId(topicId);
     fetchCoursesByTopic(topicId);
   };
-
 
   // Alert wrapper for web and app
   const showAlert = (title: string, message: string) => {
@@ -169,8 +167,13 @@ export default function Home() {
           <Text style={styles.dashboardButtonText}>Teachers Dashboard</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.loginButton} onPress={handleLoginLogout}>
-          <Text style={styles.loginButtonText}>{isLoggedIn ? "Logout" : "Login"}</Text>
+        <TouchableOpacity
+          style={styles.loginButton}
+          onPress={handleLoginLogout}
+        >
+          <Text style={styles.loginButtonText}>
+            {isLoggedIn ? "Logout" : "Login"}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -200,8 +203,8 @@ export default function Home() {
         {selectedTopicId !== null && (
           <TouchableOpacity
             onPress={() => {
-            setSelectedTopicId(null);
-            fetchAllCourses();   // Fetch all courses when showing all
+              setSelectedTopicId(null);
+              fetchAllCourses(); // Fetch all courses when showing all
             }}
           >
             <Text style={styles.clickablelink}>Show All Courses</Text>
@@ -209,7 +212,11 @@ export default function Home() {
         )}
 
         {filteredCourses.slice(0, 5).map((course) => (
-          <TouchableOpacity key={course.id} style={styles.subcard}>
+          <TouchableOpacity
+            key={course.id}
+            style={styles.subcard}
+            onPress={() => handleCoursePressed(String(course.id))}
+          >
             <Text style={styles.cardTitle}>{course.name}</Text>
             <Text style={styles.cardDetail}>By {course.author}</Text>
             <Text style={styles.cardDetail}>Created on {course.date}</Text>
@@ -251,19 +258,19 @@ const styles = StyleSheet.create({
     color: "#007AFF",
   },
   dashboardButton: {
-  marginRight: 10,
-  paddingVertical: 6,
-  paddingHorizontal: 12,
-  backgroundColor: "#2a9d8f",
-  borderRadius: 5,
-  justifyContent: "center",
-  alignItems: "center",
+    marginRight: 10,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    backgroundColor: "#2a9d8f",
+    borderRadius: 5,
+    justifyContent: "center",
+    alignItems: "center",
   },
 
   dashboardButtonText: {
-  color: "white",
-  fontWeight: "bold",
-  fontSize: 14,
+    color: "white",
+    fontWeight: "bold",
+    fontSize: 14,
   },
   loginButton: {
     backgroundColor: "#007AFF",
