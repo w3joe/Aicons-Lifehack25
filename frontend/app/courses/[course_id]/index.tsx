@@ -84,7 +84,6 @@ export default function CourseDetailScreen() {
         (a, b) => a.lesson_number - b.lesson_number
       );
       setLessons(sortedLessons);
-      console.log("Sorted lessons:", sortedLessons);
     }
   }, [course]);
 

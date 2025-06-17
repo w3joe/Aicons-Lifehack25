@@ -73,7 +73,7 @@ export default function ResultScreen() {
           user_id: user?.user_id!,
           quiz_id: quiz_id,
           quiz_score: Number(quiz_score),
-          latest_proficiency_score: Number(proficiency_score),
+          proficiency_score: Number(proficiency_score),
         };
         console.log(studentProgressData);
         const response: ProgressTracker =
@@ -120,7 +120,9 @@ export default function ResultScreen() {
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
-          onPress={() => router.push("/courses/5D4cR7rnYtNQNHIyfU5A")}
+          onPress={() =>
+            router.push(`/courses/${lessonPackage?.lessonDetails.course_id}`)
+          }
         >
           <Text style={[styles.buttonText, styles.secondaryText]}>
             Return to Course
