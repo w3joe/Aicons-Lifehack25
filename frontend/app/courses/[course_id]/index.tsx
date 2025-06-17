@@ -116,18 +116,25 @@ export default function CourseDetailScreen() {
         <Text style={styles.sectionTitle}>About this course</Text>
         <Text style={styles.description}>{course.description}</Text>
         {/* Button opens current lesson the user is at for this course based on progress tracker */}
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() =>
-            router.push(
-              `../courses/${course_id}/${course?.lessons?.at(progress?.current_lesson_number! - 1)?.lesson_id}`
-            )
-          }
-        >
-          <Text style={styles.startButtonText}>
-            {progress?.current_lesson_number == 1 ? "Start" : "Resume"}
-          </Text>
-        </TouchableOpacity>
+        {progress?.current_lesson_number! > course.lessons?.length! ? (
+          <View style={styles.courseCompleteContainer}>
+            <Text style={styles.courseCompleteText}>Course Completed!</Text>
+          </View>
+        ) : (
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={() =>
+              router.push(
+                `../courses/${course_id}/${course?.lessons?.at(progress?.current_lesson_number! - 1)?.lesson_id}`
+              )
+            }
+          >
+            <Text style={styles.startButtonText}>
+              {progress?.current_lesson_number == 1 ? "Start" : "Resume"}
+            </Text>
+          </TouchableOpacity>
+        )}
+
         <Text style={styles.sectionTitle}>Curriculum</Text>
         {course?.lessons?.map((lesson, index) => (
           <View key={lesson.lesson_id} style={styles.lessonItemContainer}>
@@ -305,6 +312,15 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 12,
     color: "#333",
+  },
+  courseCompleteContainer: {
+    alignItems: "center",
+  },
+  courseCompleteText: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginTop: 16,
+    marginBottom: 12,
   },
   description: {
     fontSize: 15,
