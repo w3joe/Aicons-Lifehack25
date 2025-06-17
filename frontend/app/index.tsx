@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../api/api";
+import { User } from "../models/User";
 
 export default function Home() {
   type Topic = {
@@ -33,12 +34,19 @@ export default function Home() {
   const [topics, setTopics] = useState<Topic[]>([]);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [user, setUser] = useState<User | null>(null);
+
 
   // Check login status on mount
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem("userToken");
+      const userJson = await AsyncStorage.getItem("user");
       setIsLoggedIn(!!token);
+      if (userJson) {
+        const parsedUser: User = JSON.parse(userJson);
+        setUser(parsedUser); //set the user here
+      }
     };
     checkLoginStatus();
   }, []);
@@ -160,12 +168,14 @@ export default function Home() {
       <View style={styles.topBar}>
         <Text style={styles.header}>AITUTOR</Text>
 
+        {user?.role === "TEACHER" && (
         <TouchableOpacity
           style={styles.dashboardButton}
-          onPress={() => router.push("/teacher")}
+          onPress={() => router.push("../classroom/teacher")}
         >
           <Text style={styles.dashboardButtonText}>Teachers Dashboard</Text>
         </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={styles.loginButton}

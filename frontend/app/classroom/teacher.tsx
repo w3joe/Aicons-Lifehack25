@@ -8,40 +8,60 @@ import {
   Platform,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { User } from "../models/User";
+import { User } from "../../models/User";
+import { Course } from "../../models/Course";
+import api from "../../api/api"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TeacherDashboard() {
+  type Classroom = {
+    classroom_id: number;
+    teacher_id: string;
+    name: string;
+  };
+
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [classrooms, setClassroom] = useState<Classroom[]>([]);
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {           
-        const userJson = await AsyncStorage.getItem("user");
-        if (userJson) {
-          const parsedUser: User = JSON.parse(userJson);
-          setUser(parsedUser);
-        }
-      } catch (error) {
-        console.error("Failed to load user:", error);
-      }
-    };
+  //load user upon opening teacher page
+  const loadUserAndClassrooms  = async () => {
+    try {
+      const userJson = await AsyncStorage.getItem("user");
+      if (userJson) {
+        const parsedUser: User = JSON.parse(userJson);
 
-    loadUser();
-  }, []);
+        // Check for teacher role
+        if (parsedUser.role !== "TEACHER") {
+          router.replace("/"); // Redirect to home
+          return;
+        }
+
+        setUser(parsedUser);
+
+        // Fetch classrooms for this teacher
+        const response = await api.get(`/teachers/${parsedUser.user_id}/classrooms`);
+        setClassroom(response.data); // Assuming response.data is array of classrooms
+
+      } else {
+        router.replace("/login"); // Not logged in
+      }
+    } catch (error) {
+      console.error("Failed to load user:", error);
+      router.replace("/login"); // Error loading user
+    }
+  };
+
+  loadUserAndClassrooms ();
+}, []);
+
 
   // Sample data for display
   const stats = [
     { label: "Courses", value: 12 },
     { label: "Students", value: 340 },
-    { label: "Pending Approvals", value: 5 },
-  ];
-
-  const courses = [
-    { id: 1, title: "React Native Basics", students: 40 },
-    { id: 2, title: "Advanced JavaScript", students: 25 },
-    { id: 3, title: "UI/UX Fundamentals", students: 18 },
   ];
 
   return (
@@ -73,13 +93,16 @@ export default function TeacherDashboard() {
       </View>
 
       {/* Courses List */}
-      <Text style={styles.sectionTitle}>Your Courses</Text>
-      {courses.map((course) => (
-        <View key={course.id} style={styles.courseCard}>
-          <Text style={styles.courseTitle}>{course.title}</Text>
-          <Text style={styles.courseDetail}>{course.students} students enrolled</Text>
-        </View>
+      <Text style={styles.sectionTitle}>My Classrooms</Text>
+      <View>
+      {classrooms.map((classroom) => (
+        <TouchableOpacity key={classroom.classroom_id} style={styles.courseCard}
+          onPress={() => router.push(`../classroom/${classroom.classroom_id}`)}
+        >
+          <Text style={styles.courseTitle}>{classroom.name}</Text>
+        </TouchableOpacity>
       ))}
+      </View>
 
       {/* Add Course Button */}
       <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addcourse")}>
