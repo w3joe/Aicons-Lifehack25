@@ -48,12 +48,14 @@ export default function ResultScreen() {
       try {
         const studentProgressData = {
           user_id: user?.user_id!,
-          course_id: "5D4cR7rnYtNQNHIyfU5A",
+          quiz_id: quiz_id,
           quiz_score: Number(quiz_score),
           latest_proficiency_score: Number(proficiency_score),
         };
+        console.log(studentProgressData)
         const response: ProgressTracker =
           await updateProgressTracker(studentProgressData);
+          
         setProgressTracker(response);
       } catch (err) {
         console.error(err);

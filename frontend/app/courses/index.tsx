@@ -40,7 +40,7 @@ export default function CoursesScreen() {
   const handleCoursePress = (name: string) => {
     // Optionally: router.push(`/courses/${id}`) if you later create dynamic pages
     var url: string = name.replace(/ /g, "_").toLowerCase();
-    router.push("../courses/${url}");
+    router.push(`../courses/${url}`);
   };
 
   const fetchAllCourses = async () => {

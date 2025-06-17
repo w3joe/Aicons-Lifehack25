@@ -18,7 +18,10 @@ export const updateProgressTracker = async (
   studentProgressData: StudentProgress
 ) => {
   try {
-    const response = await api.put("/progress", studentProgressData);
+    const response = await api.put(
+      "/progress/submit-quiz",
+      studentProgressData
+    );
     return response.data;
   } catch (error) {
     console.error("Failed to update student progress:", error);

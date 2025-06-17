@@ -43,30 +43,36 @@ export default function LessonPage() {
     fetchUser();
   }, []);
 
+  // Fetch lesson package only after user is available
   useEffect(() => {
-    (async () => {
+    if (!user) return;
+
+    const fetchLessonPackage = async () => {
       try {
         const lessonId = lesson_id as string;
         let data;
-        console.log(reattempt)
-        if (reattempt == "1")
-          data = await getAttemptedLessonPackage(lessonId, user?.user_id!);
-        else {
+
+        console.log("Reattempt:", reattempt);
+        console.log("User:", user);
+
+        if (reattempt === "1") {
+          data = await getAttemptedLessonPackage(lessonId, user.user_id);
+        } else {
           const lessonData = await getLessonById(lessonId);
           data = await getCurrentLessonPackage(
             lessonData.body.course_id,
-            user?.user_id!
+            user.user_id
           );
         }
-        // const data = await getLessonById(lessonId);
-        // const resourceData = await getResourceByLessonId(lessonId);
+
         setLessonPackage(data.body);
-        // setResource(resourceData.body);
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching lesson package:", err);
       }
-    })();
-  }, [lesson_id, user]);
+    };
+
+    fetchLessonPackage();
+  }, [user, lesson_id, reattempt]);
 
   const handleBackPress = () => {
     router.back();
@@ -89,24 +95,31 @@ export default function LessonPage() {
         >
           <Ionicons name="arrow-back" size={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{lessonPackage.lessonDetails.title}</Text>
+        <Text style={styles.headerTitle}>
+          {lessonPackage.lessonDetails.title}
+        </Text>
         <View style={{ width: 24 }} />
       </View>
       {/* Course details */}
-      {resource?.resource_type == "VIDEO"}
+      {lessonPackage.resources?.resource_type == "VIDEO"}
       <View style={styles.content}>
         <Video
-          source={{ uri: lessonPackage.resources?.url_or_content}}
+          source={{ uri: lessonPackage.resources?.url_or_content }}
           style={styles.video}
           controls
           resizeMode="contain"
         />
+        {lessonPackage.resources?.url_or_content}
 
-        <Text style={styles.description}>{lessonPackage.lessonDetails.description}</Text>
+        <Text style={styles.description}>
+          {lessonPackage.lessonDetails.description}
+        </Text>
 
         <TouchableOpacity
           style={styles.quizButton}
-          onPress={() => router.push(`/quizzes/${lessonPackage.lessonDetails.quiz_id}`)}
+          onPress={() =>
+            router.push(`/quizzes/${lessonPackage.lessonDetails.quiz_id}`)
+          }
         >
           <Text style={styles.quizButtonText}>Take Quiz</Text>
         </TouchableOpacity>
