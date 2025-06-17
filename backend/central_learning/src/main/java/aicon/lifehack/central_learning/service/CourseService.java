@@ -107,6 +107,7 @@ public class CourseService {
         courseDetails.setTopic_id(course.getTopic_id());
         courseDetails.setTitle(course.getTitle());
         courseDetails.setDescription(course.getDescription());
+        courseDetails.setThumbnail(course.getThumbnail());
         courseDetails.setLike_count(course.getLike_count());
         courseDetails.setLessons(lessons); // Add the list of lessons
         

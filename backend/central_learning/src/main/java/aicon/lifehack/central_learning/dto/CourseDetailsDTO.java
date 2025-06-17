@@ -14,6 +14,7 @@ public class CourseDetailsDTO {
     private String topic_id;
     private String title;
     private String description;
+    private String thumbnail;
     private int like_count;
     // The nested list of lessons
     private List<Lesson> lessons;
