@@ -1,5 +1,6 @@
 import { ProgressTracker } from "@/models/ProgressTracker";
 import api from "../api/api";
+import { StudentProgress } from "@/models/StudentProgress";
 
 export const createProgressTracker = async (
   progressTrackerData: ProgressTracker
@@ -14,17 +15,13 @@ export const createProgressTracker = async (
 };
 
 export const updateProgressTracker = async (
-  progress_id: string,
-  progressTrackerData: ProgressTracker
+  studentProgressData: StudentProgress
 ) => {
   try {
-    const response = await api.put(
-      `/progress/status/${progress_id}`,
-      progressTrackerData
-    );
+    const response = await api.put("/progress", studentProgressData);
     return response.data;
   } catch (error) {
-    console.error("Failed to update progress tracker:", error);
+    console.error("Failed to update student progress:", error);
     throw error;
   }
 };

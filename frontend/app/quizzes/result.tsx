@@ -1,6 +1,11 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import { useEffect, useState } from "react";
+import { getUser } from "@/services/userAsyncService";
+import { User } from "@/models/User";
+import { updateProgressTracker } from "@/services/progressTrackerService";
+import { ProgressTracker } from "@/models/ProgressTracker";
 
 export default function ResultScreen() {
   const router = useRouter();
@@ -22,6 +27,36 @@ export default function ResultScreen() {
 
   const proficiencyLabel = getProficiencyLabel(Number(proficiency_score));
   const scoreColor = getColor(Number(proficiency_score));
+
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const storedUser = await getUser();
+      if (storedUser) {
+        setUser(storedUser);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const studentProgressData = {
+          user_id: user?.user_id!,
+          course_id: "5D4cR7rnYtNQNHIyfU5A",
+          quiz_score: Number(quiz_score),
+          latest_proficiency_score: Number(proficiency_score),
+        };
+        const response:ProgressTracker = await updateProgressTracker(studentProgressData);
+        console.log(response);
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, [user]);
 
   return (
     <View style={styles.container}>
@@ -49,7 +84,7 @@ export default function ResultScreen() {
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
-        //   onPress={() => router.push("/lessons/next")}
+          //   onPress={() => router.push("/lessons/next")}
         >
           <Text style={[styles.buttonText, styles.secondaryText]}>
             Return to Course

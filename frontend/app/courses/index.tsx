@@ -1,7 +1,14 @@
 import { useRouter } from "expo-router";
-import React, { use, useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, Platform, Alert } from "react-native";
-import api from "../../api/api"
+import React, { useEffect, useState } from "react";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Platform,
+  Alert,
+} from "react-native";
+import api from "../../api/api";
 
 export default function CoursesScreen() {
   const router = useRouter();
@@ -11,7 +18,7 @@ export default function CoursesScreen() {
     name: string;
     author: string;
     date: string;
-    description: string,
+    description: string;
     topicId: string;
   };
 
@@ -22,40 +29,40 @@ export default function CoursesScreen() {
   }, []);
 
   // Alert wrapper for web and app
-    const showAlert = (title: string, message: string) => {
-      if (Platform.OS === "web") {
-        alert(`${title}: ${message}`);
-      } else {
-        Alert.alert(title, message);
-      }
-    };
+  const showAlert = (title: string, message: string) => {
+    if (Platform.OS === "web") {
+      alert(`${title}: ${message}`);
+    } else {
+      Alert.alert(title, message);
+    }
+  };
 
   const handleCoursePress = (name: string) => {
     // Optionally: router.push(`/courses/${id}`) if you later create dynamic pages
     var url: string = name.replace(/ /g, "_").toLowerCase();
-    router.push('../courses/${url}');
+    router.push("../courses/${url}");
   };
 
   const fetchAllCourses = async () => {
-  try {
-    const response = await api.get(`/courses`);
-    //const data = await response.json();
-    const data = response.data;
-    const courseArray = Array.isArray(data.body) ? data.body : [];
-    const normalizedCourses: Course[] = courseArray.map((course: any) => ({
-      id: course.course_id,
-      name: course.title,
-      author: course.author,
-      date: course.created_at,
-      description: course.description,
-      topicId: course.topic_id,
-    }));
-    
-    setCourses(normalizedCourses);
-  } catch (error) {
-    console.error("Error fetching all courses:", error);
-    showAlert("Error", "Unable to load all courses.");
-  }
+    try {
+      const response = await api.get(`/courses`);
+      //const data = await response.json();
+      const data = response.data;
+      const courseArray = Array.isArray(data.body) ? data.body : [];
+      const normalizedCourses: Course[] = courseArray.map((course: any) => ({
+        id: course.course_id,
+        name: course.title,
+        author: course.author,
+        date: course.created_at,
+        description: course.description,
+        topicId: course.topic_id,
+      }));
+
+      setCourses(normalizedCourses);
+    } catch (error) {
+      console.error("Error fetching all courses:", error);
+      showAlert("Error", "Unable to load all courses.");
+    }
   };
 
   return (
@@ -63,7 +70,10 @@ export default function CoursesScreen() {
       style={styles.container}
       contentContainerStyle={{ paddingBottom: 40 }}
     >
-      <TouchableOpacity onPress={() => router.push('/')} style={styles.backButton}>
+      <TouchableOpacity
+        onPress={() => router.push("/")}
+        style={styles.backButton}
+      >
         <Text style={styles.backButtonText}>← Back to Home</Text>
       </TouchableOpacity>
 
