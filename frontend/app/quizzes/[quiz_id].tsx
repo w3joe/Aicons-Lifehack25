@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Quiz } from "@/models/Quiz";
 import { getQuizWithQuestions } from "@/services/quizService";
+import * as Progress from "react-native-progress";
 const confidenceLevels = ["No Idea", "Maybe", "I Think So", "Definitely"];
 
 const confidenceLevelsValue: { [key: string]: number } = {
@@ -17,12 +18,14 @@ export default function QuizScreen() {
   const { quiz_id } = useLocalSearchParams();
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
+  const [progress, setProgress] = useState<number>(0);
 
   useEffect(() => {
     (async () => {
       try {
         const data = await getQuizWithQuestions(String(quiz_id));
         setQuiz(data.body);
+        console.log(data.body);
       } catch (err) {
         console.error(err);
       }
@@ -97,6 +100,17 @@ export default function QuizScreen() {
 
   return (
     <View style={styles.container}>
+      <View style={styles.progressContainer}>
+        <Progress.Bar
+          progress={progress}
+          width={400}
+          height={16}
+          color="#81c784" // lighter green
+          borderRadius={10}
+          unfilledColor="#e0e0e0"
+          borderWidth={0}
+        />
+      </View>
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>{question?.question_text}</Text>
 
@@ -144,9 +158,13 @@ ${question?.explanation}
                 <TouchableOpacity
                   key={level}
                   disabled={isSubmitted}
-                  onPress={() =>
-                    selectConfidence(question?.question_id!, level)
-                  }
+                  onPress={() => {
+                    selectConfidence(question?.question_id!, level);
+                    setProgress(
+                      (progress * quiz?.questions?.length! + 1) /
+                        quiz?.questions?.length!
+                    );
+                  }}
                   style={[
                     styles.confidenceButton,
                     !answerSelected && styles.deselectConfidenceButton,
@@ -183,16 +201,21 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "lightblue",
   },
+  progressContainer: {
+    padding: 16,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   questionContainer: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#f1f1f1",
     borderRadius: 8,
     justifyContent: "center",
   },
   questionText: {
     fontSize: 18,
-    marginBottom: 12,
+    fontWeight: 500,
+    marginBottom: 24,
   },
   option: {
     padding: 12,

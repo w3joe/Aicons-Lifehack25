@@ -157,9 +157,65 @@ export default function CourseDetailScreen() {
 
             {expandedLessonIndex === index && (
               <View style={styles.expandedContent}>
+                <View style={styles.lessonProgressContainer}>
+                  {index + 1 < progress?.current_lesson_number! && (
+                    <>
+                      <Ionicons
+                        name="refresh"
+                        size={18}
+                        color="#888"
+                        style={styles.lockIcon}
+                      />
+                      <Text style={styles.lockedText}>Attempted before</Text>
+                    </>
+                  )}
+                  {index + 1 === progress?.current_lesson_number! && (
+                    <>
+                      <Ionicons
+                        name="radio-button-on"
+                        size={18}
+                        color="#888"
+                        style={styles.lockIcon}
+                      />
+                      <Text style={styles.lockedText}>In progress</Text>
+                    </>
+                  )}
+                  {index + 1 > progress?.current_lesson_number! && (
+                    <>
+                      <Ionicons
+                        name="lock-closed"
+                        size={18}
+                        color="#888"
+                        style={styles.lockIcon}
+                      />
+                      <Text style={styles.lockedText}>Lesson not unlocked</Text>
+                    </>
+                  )}
+                </View>
                 <Text style={styles.courseDescription}>
-                  {lesson.description}
+                  Description: {lesson.description}
                 </Text>
+
+                {index + 1 < progress?.current_lesson_number! && (
+                  <TouchableOpacity
+                    style={styles.startButton}
+                    onPress={() =>
+                      router.push(`../courses/${course_id}/${lesson.lesson_id}`)
+                    }
+                  >
+                    <Text style={styles.startButtonText}>Retake Lesson</Text>
+                  </TouchableOpacity>
+                )}
+                {index + 1 === progress?.current_lesson_number! && (
+                  <TouchableOpacity
+                    style={styles.startButton}
+                    onPress={() =>
+                      router.push(`../courses/${course_id}/${lesson.lesson_id}`)
+                    }
+                  >
+                    <Text style={styles.startButtonText}>Resume Lesson</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             )}
           </View>
@@ -317,5 +373,18 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 16,
     fontWeight: "600",
+  },
+  lessonProgressContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 4,
+    marginBottom: 10,
+  },
+  lockIcon: {
+    marginRight: 6,
+  },
+  lockedText: {
+    fontSize: 14,
+    color: "#888",
   },
 });

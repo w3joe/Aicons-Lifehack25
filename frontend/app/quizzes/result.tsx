@@ -10,6 +10,8 @@ import { ProgressTracker } from "@/models/ProgressTracker";
 export default function ResultScreen() {
   const router = useRouter();
   const { quiz_id, quiz_score, proficiency_score } = useLocalSearchParams();
+  const [progressTracker, setProgressTracker] =
+    useState<ProgressTracker | null>(null);
 
   const getProficiencyLabel = (score: number) => {
     if (score >= 0.77) return "Expert";
@@ -50,8 +52,9 @@ export default function ResultScreen() {
           quiz_score: Number(quiz_score),
           latest_proficiency_score: Number(proficiency_score),
         };
-        const response:ProgressTracker = await updateProgressTracker(studentProgressData);
-        console.log(response);
+        const response: ProgressTracker =
+          await updateProgressTracker(studentProgressData);
+        setProgressTracker(response);
       } catch (err) {
         console.error(err);
       }
@@ -77,14 +80,18 @@ export default function ResultScreen() {
       <View style={styles.buttonContainer}>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.push("/courses")}
+          //   onPress={() =>
+          //     router.push(
+          //       `/courses/5D4cR7rnYtNQNHIyfU5A/${course?.lessons?.at(progressTracker?.current_lesson_number! - 1)?.lesson_id}`
+          //     )
+          //   }
         >
           <Text style={styles.buttonText}>Continue to Next Lesson</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}
-          //   onPress={() => router.push("/lessons/next")}
+          onPress={() => router.push("/courses/5D4cR7rnYtNQNHIyfU5A")}
         >
           <Text style={[styles.buttonText, styles.secondaryText]}>
             Return to Course
