@@ -53,6 +53,22 @@ public class LessonService {
         });
         return lessonList;
     }
+
+    public Lesson getLessonByQuizId(String quizId) throws ExecutionException, InterruptedException {
+        // Create a query to find the lesson where the 'quiz_id' field matches
+        QuerySnapshot querySnapshot = getLessonsCollection()
+                .whereEqualTo("quiz_id", quizId)
+                .limit(1) // We only expect one lesson per quiz, so limit to 1 for efficiency
+                .get()
+                .get();
+
+        if (!querySnapshot.isEmpty()) {
+            // Return the first (and only) document found
+            return querySnapshot.getDocuments().get(0).toObject(Lesson.class);
+        }
+
+        return null; // No lesson found with that quiz ID
+    }
     
     public Lesson updateLesson(String lessonId, Lesson lesson) throws ExecutionException, InterruptedException {
         DocumentReference docRef = getLessonsCollection().document(lessonId);

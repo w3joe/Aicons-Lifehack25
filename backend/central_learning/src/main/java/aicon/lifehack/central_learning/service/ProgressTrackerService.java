@@ -52,15 +52,11 @@ public class ProgressTrackerService {
         }
     }
     
-    // --- THIS IS THE FULLY CORRECTED METHOD ---
     public ProgressTracker updateProgress(String userId, String courseId, double proficiencyScore, double quizScore) throws ExecutionException, InterruptedException {
         DocumentReference trackerRef = getTrackerRef(userId, courseId);
         
         firestore.runTransaction(transaction -> {
-            // --- READ PHASE: ALL READS MUST HAPPEN FIRST ---
-            
-            // 1. Read the main progress tracker to get current state.
-            DocumentSnapshot trackerSnapshot = transaction.get(trackerRef).get();
+                        DocumentSnapshot trackerSnapshot = transaction.get(trackerRef).get();
             if (!trackerSnapshot.exists()) {
                 throw new IllegalStateException("Progress tracker not found. Cannot update.");
             }
@@ -68,7 +64,7 @@ public class ProgressTrackerService {
             // We need the lesson number to find the lesson that was just completed.
             int currentLessonNumber = trackerSnapshot.getLong("current_lesson_number").intValue();
             
-            // 2. Find the lesson document to get its ID.
+            // Find the lesson document to get its ID.
             // This query happens outside the transaction's read set, but it's necessary
             // to get the ID we need for the next read.
             Lesson completedLesson = lessonService.getLessonsByCourse(courseId).stream()
