@@ -11,6 +11,7 @@ import { useRouter } from "expo-router";
 import { User } from "../../models/User";
 import { Course } from "../../models/Course";
 import api from "../../api/api"
+import ProgressBarChart from "../classroom/progresschart"
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TeacherDashboard() {
@@ -24,6 +25,7 @@ export default function TeacherDashboard() {
   const [user, setUser] = useState<User | null>(null);
   const [courses, setCourses] = useState<Course[]>([]);
   const [classrooms, setClassroom] = useState<Classroom[]>([]);
+  const [progressList, setProgressList] = useState<any[]>([]);
 
   useEffect(() => {
   //load user upon opening teacher page
@@ -54,7 +56,28 @@ export default function TeacherDashboard() {
     }
   };
 
-  loadUserAndClassrooms ();
+  const fetchProgress = async () => {
+  try {
+    const response = await api.get(
+      "/student-progress?userId=50GHNGPKQeQhQDFrEfdE&lessonId=hgmvDijhHDW85St1Hm2V"
+    );
+
+    const progressData = response.data.body;
+    const formatted = progressData? [progressData] : [];
+    //const data = Array.isArray(response.data.body) ? response.data.body : [];
+
+    const transformed = formatted.map((item: any) => ({
+      lesson_id: item.lesson_id,
+      next_time_difficulty: item.next_time_difficulty || "UNKNOWN",
+    }));
+    setProgressList(transformed);
+  } catch (error) {
+    console.error("Failed to fetch progress data:", error);
+  }
+};
+
+  loadUserAndClassrooms();
+  fetchProgress();
 }, []);
 
 
@@ -108,6 +131,11 @@ export default function TeacherDashboard() {
       <TouchableOpacity style={styles.addButton} onPress={() => router.push("/addclassroom")}>
         <Text style={styles.addButtonText}>+ Add New Classroom</Text>
       </TouchableOpacity>
+
+      <View style={styles.titlecard}>
+        <Text style={styles.sectionTitle}>📊 Student Difficulty Levels</Text>
+        <ProgressBarChart progressList={progressList} />
+      </View>
     </ScrollView>
   );
 }
@@ -206,4 +234,15 @@ const styles = StyleSheet.create({
     textTransform: "uppercase",
     letterSpacing: 1,
   },
+  titlecard: {
+  backgroundColor: "#fff",
+  padding: 15,
+  borderRadius: 12,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3,
+  marginTop: 20,
+}
 });
