@@ -12,9 +12,12 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { Lesson } from "@/models/Lesson";
 import { getLessonById } from "@/services/lessonService";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
+import { getResourceByLessonId } from "@/services/resourceService";
+import { Resource } from "@/models/Resource";
 
 export default function LessonPage() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
+  const [resource, setResource] = useState<Resource | null>(null);
   const router = useRouter();
   const { lesson_id } = useLocalSearchParams();
 
@@ -22,8 +25,11 @@ export default function LessonPage() {
     (async () => {
       try {
         const lessonId = lesson_id as string;
+        console.log(lessonId)
         const data = await getLessonById(lessonId);
+        // const resourceData = await getResourceByLessonId(lessonId);
         setLesson(data.body);
+        // setResource(resourceData.body);
       } catch (err) {
         console.error(err);
       }
@@ -55,6 +61,7 @@ export default function LessonPage() {
         <View style={{ width: 24 }} />
       </View>
       {/* Course details */}
+      {/* {resource?.resource_type == "VIDEO"} */}
       <View style={styles.content}>
         <Video
           source={{ uri: lesson.title }}
@@ -63,14 +70,11 @@ export default function LessonPage() {
           resizeMode="contain"
         />
 
-        <Text style={styles.description}>
-          {lesson.time_taken} • {lesson.description}
-        </Text>
+        <Text style={styles.description}>{lesson.description}</Text>
 
         <TouchableOpacity
           style={styles.quizButton}
           onPress={() => router.push(`/quizzes/${lesson.quiz_id}`)}
-          // onPress={() => router.push(`/quizzes/rand`)}
         >
           <Text style={styles.quizButtonText}>Take Quiz</Text>
         </TouchableOpacity>

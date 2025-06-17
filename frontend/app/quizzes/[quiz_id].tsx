@@ -100,7 +100,7 @@ export default function QuizScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={styles.progressContainer}>
+      <View style={styles.centerContainer}>
         <Progress.Bar
           progress={progress}
           width={400}
@@ -113,7 +113,6 @@ export default function QuizScreen() {
       </View>
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>{question?.question_text}</Text>
-
         {question?.options.map((option) => {
           const isSelected = selected === option;
           const isAnswer = isSubmitted && option === question.correct_answer;
@@ -147,51 +146,50 @@ ${question?.explanation}
           </Text>
         )}
       </View>
-
-      <View style={styles.navContainer}>
-        {!isSubmitted ? (
-          <View style={styles.confidenceContainer}>
-            {confidenceLevels.map((level) => {
-              const isSelected =
-                confidenceLevelsPerQ[question?.question_id!] === level;
-              return (
-                <TouchableOpacity
-                  key={level}
-                  disabled={isSubmitted}
-                  onPress={() => {
-                    selectConfidence(question?.question_id!, level);
-                    setProgress(
-                      (progress * quiz?.questions?.length! + 1) /
-                        quiz?.questions?.length!
-                    );
-                  }}
-                  style={[
-                    styles.confidenceButton,
-                    !answerSelected && styles.deselectConfidenceButton,
-                  ]}
-                >
-                  <Text style={styles.confidenceButtonText}>{level}</Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        ) : currentQuestionIndex < quiz!.questions!.length - 1 ? (
-          <TouchableOpacity
-            style={styles.navButton}
-            onPress={() => setCurrentQuestionIndex((prev) => prev + 1)}
-          >
-            <Text style={styles.navButtonText}>Next</Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.navButton, styles.submitButton]}
-            onPress={calculateFinalScore}
-          >
-            <Text style={styles.submitButtonText}>Finish Quiz</Text>
-          </TouchableOpacity>
-        )}
+        <View style={[styles.navContainer, styles.centerContainer]}>
+          {!isSubmitted ? (
+            <View style={styles.confidenceContainer}>
+              {confidenceLevels.map((level) => {
+                const isSelected =
+                  confidenceLevelsPerQ[question?.question_id!] === level;
+                return (
+                  <TouchableOpacity
+                    key={level}
+                    disabled={!answerSelected}
+                    onPress={() => {
+                      selectConfidence(question?.question_id!, level);
+                      setProgress(
+                        (progress * quiz?.questions?.length! + 1) /
+                          quiz?.questions?.length!
+                      );
+                    }}
+                    style={[
+                      styles.confidenceButton,
+                      !answerSelected && styles.deselectConfidenceButton,
+                    ]}
+                  >
+                    <Text style={styles.confidenceButtonText}>{level}</Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          ) : currentQuestionIndex < quiz!.questions!.length - 1 ? (
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => setCurrentQuestionIndex((prev) => prev + 1)}
+            >
+              <Text style={styles.navButtonText}>Next</Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.navButton, styles.submitButton]}
+              onPress={calculateFinalScore}
+            >
+              <Text style={styles.submitButtonText}>Finish Quiz</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
   );
 }
 
@@ -201,7 +199,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: "lightblue",
   },
-  progressContainer: {
+  centerContainer: {
     padding: 16,
     justifyContent: "center",
     alignItems: "center",
@@ -224,6 +222,13 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     borderWidth: 1,
     borderColor: "#ccc",
+    // 3D Shadow (iOS)
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    // 3D Elevation (Android)
+    elevation: 2,
   },
   selectedOption: {
     backgroundColor: "#d0e8ff",
@@ -244,21 +249,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     flexWrap: "wrap",
     marginTop: 12,
-    gap: 8,
+    gap: 4,
+    alignItems: "center",
   },
   confidenceButton: {
-    paddingVertical: 20,
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: "#007aff",
+    backgroundColor: "#0056f5",
     borderRadius: 6,
     marginRight: 6,
     marginTop: 6,
   },
   deselectConfidenceButton: {
-    backgroundColor: "#d0e8ff",
+    backgroundColor: "#89a2ad",
   },
   confidenceButtonText: {
+    fontWeight: 500,
     fontSize: 16,
+    color: "lightblue",
   },
   navContainer: {
     flexDirection: "row",
@@ -267,12 +275,12 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   navButton: {
-    backgroundColor: "#007aff",
+    backgroundColor: "#0056f5",
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,
     flex: 1,
-    alignItems: "center",
+    alignItems: "center"
   },
   navButtonText: {
     color: "#fff",

@@ -100,7 +100,7 @@ export default function CourseDetailScreen() {
       {/* Course thumbnail */}
       <Image
         source={{
-          uri: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
+          uri: "https://i0.wp.com/calmatters.org/wp-content/uploads/2021/08/math-curriculum.jpg?resize=1200%2C900&ssl=1",
         }}
         style={styles.thumbnail}
       />
@@ -157,9 +157,10 @@ export default function CourseDetailScreen() {
               {index + 1 < progress?.current_lesson_number! && (
                 <Ionicons name="checkmark-circle" size={24} color="green" />
               )}
-              {index + 1 === progress?.current_lesson_number! ? (
+              {index + 1 === progress?.current_lesson_number! && (
                 <Ionicons name="play-circle" size={24} color="dodgerblue" />
-              ) : (
+              )}
+              {index + 1 > progress?.current_lesson_number! && (
                 <Ionicons name="lock-closed" size={22} color="lightblue" />
               )}
             </TouchableOpacity>
