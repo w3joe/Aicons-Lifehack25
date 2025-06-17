@@ -9,23 +9,18 @@ import {
 } from "react-native";
 import Video from "react-native-video";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { Lesson } from "@/models/Lesson";
 import {
   getAttemptedLessonPackage,
   getCurrentLessonPackage,
   getLessonById,
 } from "@/services/lessonService";
 import Ionicons from "@expo/vector-icons/build/Ionicons";
-import { getResourceByLessonId } from "@/services/resourceService";
-import { Resource } from "@/models/Resource";
 import { LessonPackage } from "@/models/LessonPackage";
 import { User } from "@/models/User";
 import { getUser } from "@/services/userAsyncService";
 
 export default function LessonPage() {
-  const [lesson, setLesson] = useState<Lesson | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [resource, setResource] = useState<Resource | null>(null);
   const [lessonPackage, setLessonPackage] = useState<LessonPackage | null>(
     null
   );
@@ -51,9 +46,6 @@ export default function LessonPage() {
       try {
         const lessonId = lesson_id as string;
         let data;
-
-        console.log("Reattempt:", reattempt);
-        console.log("User:", user);
 
         if (reattempt === "1") {
           data = await getAttemptedLessonPackage(lessonId, user.user_id);
@@ -180,7 +172,7 @@ const styles = StyleSheet.create({
     marginVertical: 16,
   },
   quizButton: {
-    backgroundColor: "#4A90E2",
+    backgroundColor: "#1976d2",
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",

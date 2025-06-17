@@ -112,7 +112,7 @@ export default function CourseDetailScreen() {
       {/* Course thumbnail */}
       <Image
         source={{
-          uri: "https://i0.wp.com/calmatters.org/wp-content/uploads/2021/08/math-curriculum.jpg?resize=1200%2C900&ssl=1",
+          uri: course.thumbnail,
         }}
         style={styles.thumbnail}
       />

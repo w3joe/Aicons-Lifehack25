@@ -9,4 +9,5 @@ export interface Course {
   date: string;
   like_count?: number; // Default to 0 when used
   lessons?: Lesson[]; // Array of lessons
+  thumbnail:string;
 }
