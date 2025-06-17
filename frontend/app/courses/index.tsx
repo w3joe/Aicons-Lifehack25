@@ -14,7 +14,7 @@ export default function CoursesScreen() {
   const router = useRouter();
 
   type Course = {
-    id: number;
+    id: string;
     name: string;
     author: string;
     date: string;
@@ -37,10 +37,8 @@ export default function CoursesScreen() {
     }
   };
 
-  const handleCoursePress = (name: string) => {
-    // Optionally: router.push(`/courses/${id}`) if you later create dynamic pages
-    var url: string = name.replace(/ /g, "_").toLowerCase();
-    router.push(`../courses/${url}`);
+  const handleCoursePress = (course_id: string) => {
+    router.push(`/courses/${course_id}`);
   };
 
   const fetchAllCourses = async () => {
@@ -84,7 +82,7 @@ export default function CoursesScreen() {
           key={course.id}
           style={styles.courseCard}
           activeOpacity={0.9}
-          onPress={() => handleCoursePress(course.name)}
+          onPress={() => handleCoursePress(course.id)}
         >
           <Text style={styles.courseTitle}>{course.name}</Text>
           <Text style={styles.courseMeta}>
