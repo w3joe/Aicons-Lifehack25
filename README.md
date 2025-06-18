@@ -45,71 +45,71 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
 ## ✨ Features
 
 ### 🔐 Secure registration and login screens
-
+<p>
+  <em>User can register for an account as a teacher or student.</em>
+</p>
 <p float="left">
   <img src="screenshots/register.png" alt="register" width="32%" />
   <img src="screenshots/login.png" alt="login" width="32%" />
 </p>
-<p>
-  <em>User can register for an account as a teacher or student.</em>
-</p>
+
 
 ### 🎨 Beautiful and intuitive mobile interface
-
+<p>
+  <em>Courses can be filtered by topics or queried using the search bar.</em>
+</p>
 <p float="left">
 <img src="screenshots/home.png" alt="home" width="32%" />
   <img src="screenshots/search-course.png" alt="search-course" width="32%" />
   
 </p>
-<p>
-  <em>Courses can be filtered by topics or queried using the search bar.</em>
-</p>
+
 
 ### 🏆 Accessible content to well-structured courses
-
+<p>
+  <em>Lessons are completed sequentially, and users can choose to retake a lesson to refresh their memory.</em>
+</p>
 <p float="left">
 <img src="screenshots/course.png" alt="course" width="32%" />
 <img src="screenshots/lesson.png" alt="lesson" width="32%" />
 </p>
-<p>
-  <em>Lessons are completed sequentially, and users can choose to retake a lesson to refresh their memory.</em>
-</p>
+
 
 ### 💬 AI Q&A chat for real-time support
-
-<p float="left">
-<img src="screenshots/ask-ai.png" alt="ask-ai" width="32%" />
-</p>
 <p>
   <em>AiTutor tailors responses based on the user's proficiency level.</em>
 </p>
+<p float="left">
+<img src="screenshots/ask-ai.png" alt="ask-ai" width="32%" />
+</p>
+
 
 ### 🧠 Adaptive lessons with dynamic quiz difficulty based on previous results
-
+<p>
+  <em>Result is calculated based on confidence level and correct answers. This will determine the next lesson's difficulty based on the users' proficiency.</em>
+</p>
 <p float="left">
 <img src="screenshots/quiz.png" alt="quiz" width="32%" />
 <img src="screenshots/result.png" alt="result" width="32%" />
 </p>
-<p>
-  <em>Result is calculated based on confidence level and correct answers. This will determine the next lesson's difficulty based on the users' proficiency.</em>
-</p>
+
 
 ### 📊 Analytics dashboard for teachers to monitor performance
-
+<p>
+  <em>Teachers can manage their classes in a dashboard, where they can monitor their students' progress.</em>
+</p>
 <p float="left">
 <img src="screenshots/dashboard.png" alt="dashboard" width="32%" />
 <img src="screenshots/class.png" alt="class" width="32%" />
 </p>
+
 <p>
-  <em>Teachers can manage their classes in a dashboard, where they can monitor their students' progress.</em>
+  <em>Using the dashboard, they can also create new class, courses and add students to classes.</em>
 </p>
 <p float="left">
 <img src="screenshots/create-class.png" alt="create-class" width="32%" />
 <img src="screenshots/create-course.png" alt="create-course" width="32%" />
 <img src="screenshots/create-student.png" alt="create-student" width="32%" />
-</p>
-<p>
-  <em>Using the dashboard, they can also create new class, courses and add students to classes.</em>
 </p>
 
 ---
