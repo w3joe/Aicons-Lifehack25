@@ -11,8 +11,8 @@ Follow these steps:
 ## Requirements
 
 - A smartphone or tablet with internet access
-- The **Expo Go** app installed on your device
-  - [Expo Go on iOS (App Store)](https://apps.apple.com/app/expo-go/id982107779)
+- The **Expo Go** app installed on your device  
+  - [Expo Go on iOS (App Store)](https://apps.apple.com/app/expo-go/id982107779)  
   - [Expo Go on Android (Google Play)](https://play.google.com/store/apps/details?id=host.exp.exponent)
 
 ## How to Access
