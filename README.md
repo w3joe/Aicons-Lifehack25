@@ -1,8 +1,6 @@
-# 📚 AiTutor — Personalized AI-Powered Learning Platform
+# 📚 AiTutor
 
-> AiTutor adapts lessons in real time to each student’s learning ability—making learning fun, personalised, and data-driven for students and teachers alike. AiTutor also allows distant learning at students' own free time and restricted to certain school hours; this can cater to students in different regions, making learning more flexible.
-
----
+> AiTutor adapts lessons in real time to each student’s learning ability—making learning fun, personalised, and data-driven for students and teachers alike.
 
 ## 🚀 Overview
 
