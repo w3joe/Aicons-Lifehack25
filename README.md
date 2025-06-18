@@ -1,27 +1,118 @@
-# Aicons-Lifehack25
+# 📚 AiTutor — Personalized AI-Powered Learning Platform
 
-# Accessing the Expo App with Expo Go
+> AiTutor adapts lessons in real time to each student’s learning ability—making learning fun, personalised, and data-driven for students and teachers alike. AiTutor also allows distant learning at students' own free time and restricted to certain school hours; this can cater to students in different regions, making learning more flexible.
 
-To try out the Expo app hosted at:
+---
 
-exp://f2f-pf8-w3joe-8081.exp.direct
+## 🚀 Overview
 
-Follow these steps:
+**AiTutor** is an **AI-powered adaptive learning platform** designed to personalize education in real-time based on a student’s **progress**, **learning style**, and **confidence level**. The system also provides **teachers** with an intuitive dashboard that gives live analytics to identify struggling students and intervene early with targeted support.
 
-## Requirements
+---
 
-- A smartphone or tablet with internet access
-- The **Expo Go** app installed on your device  
-  - [Expo Go on iOS (App Store)](https://apps.apple.com/app/expo-go/id982107779)  
-  - [Expo Go on Android (Google Play)](https://play.google.com/store/apps/details?id=host.exp.exponent)
+## 👥 Team Members
 
-## How to Access
+| Name                                            | Role           | Responsibilities           |
+| ----------------------------------------------- | -------------- | -------------------------- |
+| [jinghaochua](https://github.com/jinghaochua)   | Frontend       | React Native, UI           |
+| [w3joe](https://github.com/w3joe)               | Frontend       | React Native, UI, Docker   |
+| [GordonWong03](https://github.com/GordonWong03) | Backend        | Java Spring Boot, Firebase |
+| [WeiJie03](https://github.com/WeiJie03)         | Infrastructure | Docker, Data Generation    |
 
-1. Open the **Expo Go** app on your device.
-2. Tap on the **“Explore”** tab or the **“Enter URL”** option.
-3. Enter the URL exactly: exp://f2f-pf8-w3joe-8081.exp.direct
-4. The app will load and run directly on your device via Expo Go.
+---
 
-## Notes
+## 🛠️ Tech Stack
 
-- Make sure you have a stable internet connection, as the app runs remotely.
+| Layer        | Tools / Libraries           |
+| ------------ | --------------------------- |
+| **Frontend** | React Native                |
+| **Backend**  | Java Spring Boot, Docker    |
+| **Database** | Firebase (Auth + Firestore) |
+| **AI/ML**    | Cohere AI API               |
+| **Storage**  | Cloudinary                  |
+| **Testing**  | Postman                     |
+
+---
+
+## 📌 Chosen Problem Statement
+
+In every classroom, there are students who fall behind—not because they're less capable, but because they learn differently. Some need more time, others need more visuals, and a few just need someone to understand how they think. Traditional education often takes a one-size-fits-all approach, leaving these students underserved and unnoticed.
+
+AiTutor was born from a simple belief: **every student deserves a learning experience tailored to them**. We wanted to reimagine education as something dynamic, personal, and compassionate. By combining the power of AI, real-time analytics, and thoughtful design, AiTutor adapts to the unique pace and style of each learner—whether they thrive with visuals, learn best by doing, or need encouragement along the way.
+
+Our goal isn’t just to teach — it’s to help students feel seen, supported, and empowered in their learning journey.
+
+---
+
+## ✨ Features
+
+- 🔐 Secure registration and login screens
+<p float="left">
+  <img src="screenshots/register.png" alt="register" width="45%" />
+  <img src="screenshots/login.png" alt="login" width="45%" />
+</p>
+<p>
+  <em>From left to right: Registration Screen | Login Screen</em>
+</p>
+- 🎨 Beautiful and intuitive mobile interface
+<p float="left">
+<img src="screenshots/home.png" alt="home" width="32%" />
+  <img src="screenshots/teacher-dashboard.png" alt="Teacher Analytics" width="32%" />
+  <img src="screenshots/chat-feature.png" alt="Chat Feature" width="32%" />
+</p>
+<p>
+  <em>From left to right: Registration Screen | Login Screen</em>
+</p>
+- 🏆 Accessible content to well-structured courses
+- 🧠 Adaptive lessons with dynamic quiz difficulty based on previous results
+- 💬 AI Q&A chat for real-time support
+- 📊 Analytics dashboard for teachers to monitor performance
+
+---
+
+## 📸 Screenshots
+
+> _Add your project screenshots here_  
+> Example:
+
+![Student Dashboard](screenshots/student-dashboard.png)  
+_Student view with real-time progress tracking_
+
+![Teacher Analytics](screenshots/teacher-dashboard.png)  
+_Teacher dashboard showing student analytics by difficulty level_
+
+---
+
+## 🧩 How It Works
+
+AiTutor uses a rule-based algorithm to adapt:
+
+- **Lesson difficulty** based on quiz accuracy & confidence levels
+- **Presentation mode** based on preferred learning styles (visual, auditory, kinesthetic)
+- **Teacher analytics** to show students at different proficiency levels
+
+The backend handles lesson delivery and scoring, while the frontend adapts dynamically based on user data and feedback.
+
+---
+
+## 🏁 Getting Started
+
+To get the project running locally, clone both frontend and backend:
+
+### 🔷 Frontend (React Native)
+
+```bash
+cd frontend
+npm install
+npx expo start
+```
+
+### 🔸 Backend (Java Spring Boot)
+
+```bash
+cd backend
+mvn clean install
+mvn spring-boot:run
+```
+
+- Note that a firebase-adminsdk json and Cohere api key is required in src/main/resources for the application to work
