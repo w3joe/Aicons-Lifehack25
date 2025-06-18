@@ -32,7 +32,7 @@
 
 ---
 
-## 📌 Chosen Problem Statement
+## 😢 Problem
 
 In every classroom, there are students who fall behind—not because they're less capable, but because they learn differently. Some need more time, others need more visuals, and a few just need someone to understand how they think. Traditional education often takes a one-size-fits-all approach, leaving these students underserved and unnoticed.
 
