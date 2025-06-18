@@ -15,7 +15,7 @@ const confidenceLevelsValue: { [key: string]: number } = {
 
 export default function QuizScreen() {
   const router = useRouter();
-  const { quiz_id } = useLocalSearchParams();
+  const { quiz_id, reattempt } = useLocalSearchParams();
 
   const [quiz, setQuiz] = useState<Quiz | null>(null);
   const [progress, setProgress] = useState<number>(0);
@@ -85,11 +85,12 @@ export default function QuizScreen() {
     });
     total_proficiency_score = (proficiency_score * 100) / qnsCount;
     router.push({
-      pathname: "../quizzes/result", // or any route file you have
+      pathname: `../quizzes/${quiz_id}/result`, // or any route file you have
       params: {
         quiz_id: quiz_id,
         quiz_score: total_quiz_score,
         proficiency_score: total_proficiency_score,
+        reattempt: reattempt
       },
     });
   };

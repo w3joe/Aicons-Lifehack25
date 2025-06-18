@@ -109,10 +109,9 @@ export default function LessonPage() {
           <TouchableOpacity
             style={styles.quizButton}
             onPress={() =>
-              // router.push(
-              //   `/ask-aitutor/${lessonPackage.resources?.resource_id}`
-              // )
-              router.push(`/ask-aitutor/123`)
+              router.push(
+                `/ask-aitutor/${lessonPackage.resources?.resource_id}`
+              )
             }
           >
             <Text style={styles.quizButtonText}>Ask Aitutor</Text>
@@ -120,7 +119,12 @@ export default function LessonPage() {
           <TouchableOpacity
             style={styles.quizButton}
             onPress={() =>
-              router.push(`/quizzes/${lessonPackage.lessonDetails.quiz_id}`)
+              router.push({
+                pathname: `../../quizzes/${lessonPackage.lessonDetails.quiz_id}`,
+                params: {
+                  reattempt: reattempt,
+                },
+              })
             }
           >
             <Text style={styles.quizButtonText}>Take Quiz</Text>

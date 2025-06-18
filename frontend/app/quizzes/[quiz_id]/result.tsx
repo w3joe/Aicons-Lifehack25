@@ -4,7 +4,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useState } from "react";
 import { getUser } from "@/services/userAsyncService";
 import { User } from "@/models/User";
-import { updateProgressTracker } from "@/services/progressTrackerService";
+import {
+  updateAttemptedProgressTracker,
+  updateProgressTracker,
+} from "@/services/progressTrackerService";
 import { ProgressTracker } from "@/models/ProgressTracker";
 import { getIdFromQuizId } from "@/services/quizService";
 import { getCurrentLessonPackage } from "@/services/lessonService";
@@ -12,7 +15,8 @@ import { LessonPackage } from "@/models/LessonPackage";
 
 export default function ResultScreen() {
   const router = useRouter();
-  const { quiz_id, quiz_score, proficiency_score } = useLocalSearchParams();
+  const { quiz_id, quiz_score, proficiency_score, reattempt } =
+    useLocalSearchParams();
   const [progressTracker, setProgressTracker] =
     useState<ProgressTracker | null>(null);
   const [lessonPackage, setLessonPackage] = useState<LessonPackage | null>(
@@ -51,6 +55,7 @@ export default function ResultScreen() {
 
   useEffect(() => {
     if (!user) return;
+    console.log(user);
     const fetchLessonPackage = async () => {
       try {
         const ids = await getIdFromQuizId(String(quiz_id));
@@ -69,22 +74,36 @@ export default function ResultScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const studentProgressData = {
-          user_id: user?.user_id!,
-          quiz_id: quiz_id,
-          quiz_score: Number(quiz_score),
-          proficiency_score: Number(proficiency_score),
-        };
-        console.log(studentProgressData);
-        const response: ProgressTracker =
-          await updateProgressTracker(studentProgressData);
+        if (lessonPackage !== undefined || lessonPackage !== null) {
+          let response: ProgressTracker;
+          if (reattempt == "0") {
+            const studentProgressData = {
+              user_id: user?.user_id!,
+              quiz_id: quiz_id,
+              quiz_score: Number(quiz_score),
+              proficiency_score: Number(proficiency_score),
+            };
+            response = await updateProgressTracker(studentProgressData);
+          } else {
+            const studentAttemptedProgressData = {
+              user_id: user?.user_id!,
+              lesson_id: lessonPackage?.lessonDetails.lesson_id,
+              quiz_score: Number(quiz_score),
+              proficiency_score: Number(proficiency_score),
+            };
 
-        setProgressTracker(response);
+            response = await updateAttemptedProgressTracker(
+              studentAttemptedProgressData
+            );
+          }
+          setProgressTracker(response);
+
+        }
       } catch (err) {
         console.error(err);
       }
     })();
-  }, [user]);
+  }, [user, lessonPackage]);
 
   return (
     <View style={styles.container}>
@@ -103,7 +122,7 @@ export default function ResultScreen() {
 
       {/* Buttons */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={styles.button}
           onPress={() =>
             router.push(
@@ -112,11 +131,11 @@ export default function ResultScreen() {
           }
         >
           <Text style={styles.buttonText}>
-            {Number(proficiency_score) <= 33
+            {Number(proficiency_score) < 33
               ? "Restart Lesson"
               : "Continue to Next Lesson"}
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <TouchableOpacity
           style={[styles.button, styles.secondaryButton]}

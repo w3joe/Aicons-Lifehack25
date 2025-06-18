@@ -28,3 +28,18 @@ export const updateProgressTracker = async (
     throw error;
   }
 };
+
+export const updateAttemptedProgressTracker = async (
+  studentProgressData: StudentProgress
+) => {
+  try {
+    const response = await api.put(
+      "/student-progress/retake",
+      studentProgressData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update attempted student progress:", error);
+    throw error;
+  }
+};
