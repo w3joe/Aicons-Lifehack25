@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import React, { useEffect, useState, } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -9,6 +9,7 @@ import {
   View,
   Platform,
   Linking,
+  Image,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../api/api";
@@ -19,6 +20,7 @@ export default function Home() {
     id: string;
     name: string;
     description: string;
+    icon?: any;
   };
 
   type Course = {
@@ -37,7 +39,13 @@ export default function Home() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [user, setUser] = useState<User | null>(null);
 
-  // Check login status on mount
+  const topicIcons: { [key: string]: any } = {
+    math: require("../assets/images/math.png"),
+    science: require("../assets/images/science.png"),
+    programming: require("../assets/images/programming.png"),
+    data_science_AI: require("../assets/images/programming.png"),
+  };
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       const token = await AsyncStorage.getItem("userToken");
@@ -45,28 +53,25 @@ export default function Home() {
       setIsLoggedIn(!!token);
       if (userJson) {
         const parsedUser: User = JSON.parse(userJson);
-        setUser(parsedUser); //set the user here
+        setUser(parsedUser);
       }
     };
     checkLoginStatus();
   }, []);
 
-  // Fetch topics from backend on mount
   useEffect(() => {
     const fetchTopics = async () => {
       try {
         const response = await api.get("/topics");
-        //const data = await response.json();
         const data = response.data;
-        // Defensive: check if body is an array
         const topicsArray = Array.isArray(data.body) ? data.body : [];
-        // Optional: map topic_id to id to keep consistent keys
         const normalizedTopics: Topic[] = topicsArray.map((topic: any) => ({
           id: topic.topic_id,
           name: topic.name,
           description: topic.description,
-        }));
+          icon: topicIcons[topic.name.toLowerCase()] || require("../assets/images/home.png"), // fallback
 
+        }));
         setTopics(normalizedTopics);
       } catch (error) {
         console.error("Error fetching topics:", error);
@@ -81,7 +86,6 @@ export default function Home() {
   const fetchAllCourses = async () => {
     try {
       const response = await api.get(`/courses`);
-      //const data = await response.json();
       const data = response.data;
       const courseArray = Array.isArray(data.body) ? data.body : [];
       const normalizedCourses: Course[] = courseArray.map((course: any) => ({
@@ -91,7 +95,6 @@ export default function Home() {
         date: course.created_at,
         topicId: course.topic_id,
       }));
-
       setCourses(normalizedCourses);
     } catch (error) {
       console.error("Error fetching all courses:", error);
@@ -99,15 +102,9 @@ export default function Home() {
     }
   };
 
-  // Filter courses based on selected topic
-  const filteredCourses = selectedTopicId
-    ? courses.filter((course) => course.topicId === selectedTopicId)
-    : courses;
-
   const fetchCoursesByTopic = async (topicId: string) => {
     try {
       const response = await api.get(`/topics/${topicId}/courses`);
-      //const data = await response.json();
       const data = response.data;
       const courseArray = Array.isArray(data.body) ? data.body : [];
       const normalizedCourses: Course[] = courseArray.map((course: any) => ({
@@ -124,7 +121,6 @@ export default function Home() {
     }
   };
 
-  // Check if user is logged in
   const handleLoginLogout = async () => {
     if (isLoggedIn) {
       await AsyncStorage.removeItem("userToken");
@@ -136,7 +132,6 @@ export default function Home() {
     }
   };
 
-  // Directs to all courses page
   const handleSeeMore = () => {
     router.push("/courses");
   };
@@ -145,13 +140,11 @@ export default function Home() {
     router.push(`/courses/${course_id}`);
   };
 
-  // Make Topic ID == selected ID & filter courses based on selected ID
   const handleTopicPress = (topicId: string) => {
     setSelectedTopicId(topicId);
     fetchCoursesByTopic(topicId);
   };
 
-  // Alert wrapper for web and app
   const showAlert = (title: string, message: string) => {
     if (Platform.OS === "web") {
       alert(`${title}: ${message}`);
@@ -160,61 +153,65 @@ export default function Home() {
     }
   };
 
+  const filteredCourses = selectedTopicId
+    ? courses.filter((course) => course.topicId === selectedTopicId)
+    : courses;
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ paddingBottom: 40 }}
-    >
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }}>
       <View style={styles.topBar}>
         <Text style={styles.header}>AITUTOR</Text>
 
         {user?.role === "TEACHER" && (
-        <TouchableOpacity
-          style={styles.dashboardButton}
-          onPress={() => router.push("../classroom/teacher")}
-        >
-          <Text style={styles.dashboardButtonText}>Teachers Dashboard</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.dashboardButton}
+            onPress={() => router.push("../classroom/teacher")}
+          >
+            <Text style={styles.dashboardButtonText}>Teachers Dashboard</Text>
+          </TouchableOpacity>
         )}
 
-        <TouchableOpacity
-          style={styles.loginButton}
-          onPress={handleLoginLogout}
-        >
-          <Text style={styles.loginButtonText}>
-            {isLoggedIn ? "Logout" : "Login"}
-          </Text>
+        {user?.role === "STUDENT" && (
+          <Text style={styles.header}>Hello Student {user.username}!</Text>
+        )}
+
+        <TouchableOpacity style={styles.loginButton} onPress={handleLoginLogout}>
+          <Text style={styles.loginButtonText}>{isLoggedIn ? "Logout" : "Login"}</Text>
         </TouchableOpacity>
       </View>
 
-      <View style={styles.titlecard}>
+      <View style={styles.cardBase}>
         <Text style={styles.sectionTitle}>🏷️ Topics</Text>
-        <ScrollView nestedScrollEnabled>
+        <ScrollView nestedScrollEnabled horizontal showsHorizontalScrollIndicator={true}>
           {topics.map((topic) => (
             <TouchableOpacity
               key={topic.id}
-              style={[styles.subcard, selectedTopicId === topic.id && styles.selectedButton,]} // make it show a topic is selected
+              style={[
+                styles.subcard,
+                selectedTopicId === topic.id && styles.selectedButton,
+              ]}
               onPress={() => handleTopicPress(topic.id)}
             >
+              {topic.icon && (
+                <Image source={topic.icon} style={styles.topicIcon} />
+              )}
               <Text style={styles.cardTitle}>{topic.name}</Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
       </View>
 
-      <View style={styles.titlecard}>
+      <View style={styles.cardBase}>
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>📚 Courses</Text>
-          <Text style={styles.clickablelink} onPress={handleSeeMore}>
-            See More
-          </Text>
+          <Text style={styles.clickablelink} onPress={handleSeeMore}>See More</Text>
         </View>
 
         {selectedTopicId !== null && (
           <TouchableOpacity
             onPress={() => {
               setSelectedTopicId(null);
-              fetchAllCourses(); // Fetch all courses when showing all
+              fetchAllCourses();
             }}
           >
             <Text style={styles.clickablelink}>Show All Courses</Text>
@@ -228,22 +225,34 @@ export default function Home() {
             onPress={() => handleCoursePressed(String(course.id))}
           >
             <Text style={styles.cardTitle}>{course.name}</Text>
-            <Text style={styles.cardDetail}>By {course.author}</Text>
-            <Text style={styles.cardDetail}>Created on {course.date}</Text>
+            <Text style={styles.cardDetail}>By {course.author || "..."}</Text>
+            <Text style={styles.cardDetail}>Created on {course.date?.slice(0, 10) || "..."}</Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <View style={styles.titlecard}>
-        <Text style={styles.sectionTitle}>Contact Us</Text>
-        <Text style={styles.cardDetail}>Email: support@aitutor.com</Text>
-        <Text style={styles.cardDetail}>Phone: +65 1234 5678</Text>
-        <Text style={styles.cardDetail}>Operating Hours: Mon–Fri, 9am–6pm</Text>
+      <View style={styles.cardBase}>
+        <Text style={styles.sectionTitle}>📞 Contact Us</Text>
+
+        <View style={styles.contactItem}>
+          <Text style={styles.contactIcon}>📧</Text>
+          <Text style={styles.contactText}>support@aitutor.com</Text>
+        </View>
+
+        <View style={styles.contactItem}>
+          <Text style={styles.contactIcon}>📱</Text>
+          <Text style={styles.contactText}>+65 1234 5678</Text>
+        </View>
+
+        <View style={styles.contactItem}>
+          <Text style={styles.contactIcon}>🕒</Text>
+          <Text style={styles.contactText}>Mon-Fri, 9am-6pm</Text>
+        </View>
 
         <TouchableOpacity
-         style={styles.feedbackButton}
+          style={styles.feedbackButton}
           onPress={() => {
-           const subject = encodeURIComponent("Feedback for AITUTOR");
+            const subject = encodeURIComponent("Feedback for AITUTOR");
             const body = encodeURIComponent("Hi AITUTOR Team,\n\nI'd like to share the following feedback...");
             const mailtoLink = `mailto:support@aitutor.com?subject=${subject}&body=${body}`;
 
@@ -264,7 +273,6 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    //padding: 20,
     backgroundColor: "lightblue",
   },
   topBar: {
@@ -283,113 +291,115 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   header: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
     color: "#007AFF",
   },
   dashboardButton: {
-    marginRight: 10,
+    backgroundColor: "#2a9d8f",
     paddingVertical: 6,
     paddingHorizontal: 12,
-    backgroundColor: "#2a9d8f",
-    borderRadius: 5,
-    justifyContent: "center",
-    alignItems: "center",
+    borderRadius: 6,
+    marginHorizontal: 6,
   },
-
   dashboardButtonText: {
-    color: "white",
+    color: "#fff",
     fontWeight: "bold",
-    fontSize: 14,
-  },
-   profileButton: {
-    backgroundColor: "#007BFF",
-    padding: 10,
-    borderRadius: 5,
-    marginLeft: 'auto'  
-  },
-  profileButtonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: 'bold',
   },
   loginButton: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#2a9d8f",
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 6,
   },
   loginButtonText: {
     color: "#fff",
-    fontWeight: "700",
+    fontWeight: "bold",
     fontSize: 14,
-    textTransform: "uppercase",
-    letterSpacing: 1,
   },
   sectionTitle: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 20,
-    marginTop: 10,
+    color: "#333",
+    marginBottom: 10,
   },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-  titlecard: {
-    padding: 10,
-    backgroundColor: "#f0f0f0",
-    marginTop: 10,
-    marginBottom: 10,
+  cardBase: {
+    backgroundColor: "#d6efff",
+    borderRadius: 16,
+    padding: 16,
+    marginHorizontal: 10,
+    marginVertical: 10,
     shadowColor: "#000",
     shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 10,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 6,
   },
   subcard: {
+    backgroundColor: "#fefefe",
     padding: 20,
-    backgroundColor: "#f0f0f0",
+    borderRadius: 16,
     marginBottom: 10,
+    marginRight: 10,
     shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 5,
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 4,
+  },
+  topicIcon: {
+    width: 80,
+    height: 80,
+    marginBottom: 6,
+    alignSelf: "center",
+  },
+  selectedButton: {
+    backgroundColor: "#2a9d8f",
+    borderColor: "white",
+    borderWidth: 1,
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
-    marginBottom: 5,
   },
   cardDetail: {
     fontSize: 14,
     color: "#555",
   },
   clickablelink: {
+    color: "#005f99",
     fontSize: 16,
-    color: "#007bff",
-    fontWeight: "500",
-    marginBottom: 20,
-    marginTop: 10,
+    marginTop: 6,
   },
-  selectedButton: {
-    backgroundColor: "lightgrey",
-    borderColor: "grey",
-    borderWidth: 1,
+  contactItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  contactIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  contactText: {
+    fontSize: 16,
+    color: "#333",
   },
   feedbackButton: {
-  marginTop: 15,
-  backgroundColor: "#2a9d8f",
-  paddingVertical: 12,
-  paddingHorizontal: 18,
-  borderRadius: 8,
-  alignItems: "center",
+    marginTop: 15,
+    backgroundColor: "#2a9d8f",
+    paddingVertical: 12,
+    paddingHorizontal: 18,
+    borderRadius: 8,
+    alignItems: "center",
   },
   feedbackButtonText: {
-  color: "#fff",
-  fontSize: 16,
-  fontWeight: "600",
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });

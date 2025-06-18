@@ -74,9 +74,10 @@ public class AIService {
     private String generatePreambleForDifficulty(Difficulty difficulty, String title) {
         // Use a default preamble in case the difficulty is null or unexpected.
         String defaultPreamble = String.format("""
-            You are an expert tutor. Based on the context from the following lesson title, answer the user's question.
+            You are an expert tutor.  answer the user's question.
             The lesson title is: '%s'.
-            Only use the information implied by this title to answer the question. Do not repeat the lesson title in the answer
+            Only use the information implied by this title to answer the question. Do not repeat the lesson title in the answer. For example
+            do not put "base on the lesson title "title". Just explain the answer and not repeat the lesson title in the answer.
             """, title);
 
         if (difficulty == null) {
@@ -88,7 +89,8 @@ public class AIService {
         switch (difficulty) {
             case REMEDIAL:
                 return String.format("""
-                    You are a kind and patient teacher explaining the concept of '%s' to someone with no prior experience. Do not repeat the lesson title in the answer
+                    You are a kind and patient teacher explaining the concept of '%s' to someone with no prior experience. Do not repeat the lesson title in the answer. For example
+            do not put "base on the lesson title "title". Just explain the answer and not repeat the lesson title in the answer.
                     
                     Explain slowly and simply. Use:
                     - Everyday analogies or metaphors
@@ -100,7 +102,8 @@ public class AIService {
             
             case BEGINNER:
                 return String.format("""
-                    You are an engaging instructor teaching the concept of '%s' to someone with some experience and foundational knowledge. Do not repeat the lesson title in the answer
+                    You are an engaging instructor teaching the concept of '%s' to someone with some experience and foundational knowledge. Do not repeat the lesson title in the answer. For example
+            do not put "base on the lesson title "title". Just explain the answer and not repeat the lesson title in the answer.
                     
                     Your explanation should:
                     - Build on what they likely already know
@@ -112,7 +115,8 @@ public class AIService {
 
             case INTERMEDIATE:
                 return String.format("""
-                    You are a domain expert mentoring a capable student in the concept of '%s'. The student has advanced knowledge and is seeking a deeper understanding. Do not repeat the lesson title in the answer
+                    You are a domain expert mentoring a capable student in the concept of '%s'. Do not repeat the lesson title in the answer. For example
+            do not put "base on the lesson title "title". Just explain the answer and not repeat the lesson title in the answer.
                     
                     Your response should:
                     - Dive into the theory and inner mechanics
@@ -124,8 +128,8 @@ public class AIService {
 
             case ADVANCED:
                 return String.format("""
-                    You are a fellow expert discussing the concept of '%s' with another specialist. Do not repeat the lesson title in the answer
-
+                    You are a fellow expert discussing the concept of '%s' with another specialist.Do not repeat the lesson title in the answer. For example
+            do not put "base on the lesson title "title". Just explain the answer and not repeat the lesson title in the answer.
                     Your explanation should:
                     - Be concise, insightful, and assume fluency
                     - Focus on nuanced trade-offs or optimizations

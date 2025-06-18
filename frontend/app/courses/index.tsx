@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
-  TextInput
+  TextInput,
 } from "react-native";
 import api from "../../api/api";
 
@@ -26,7 +26,7 @@ export default function CoursesScreen() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredCourses = courses.filter(course =>
+  const filteredCourses = courses.filter((course) =>
     `${course.name} ${course.author}`.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -34,7 +34,6 @@ export default function CoursesScreen() {
     fetchAllCourses();
   }, []);
 
-  // Alert wrapper for web and app
   const showAlert = (title: string, message: string) => {
     if (Platform.OS === "web") {
       alert(`${title}: ${message}`);
@@ -50,7 +49,6 @@ export default function CoursesScreen() {
   const fetchAllCourses = async () => {
     try {
       const response = await api.get(`/courses`);
-      //const data = await response.json();
       const data = response.data;
       const courseArray = Array.isArray(data.body) ? data.body : [];
       const normalizedCourses: Course[] = courseArray.map((course: any) => ({
@@ -61,7 +59,6 @@ export default function CoursesScreen() {
         description: course.description,
         topicId: course.topic_id,
       }));
-
       setCourses(normalizedCourses);
     } catch (error) {
       console.error("Error fetching all courses:", error);
@@ -81,11 +78,12 @@ export default function CoursesScreen() {
         <Text style={styles.backButtonText}>← Back to Home</Text>
       </TouchableOpacity>
 
-      <Text style={styles.header}>All Courses</Text>
+      <Text style={styles.header}>📘 All Courses</Text>
 
       <TextInput
         style={styles.searchInput}
         placeholder="Search courses..."
+        placeholderTextColor="#888"
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
@@ -99,7 +97,7 @@ export default function CoursesScreen() {
         >
           <Text style={styles.courseTitle}>{course.name}</Text>
           <Text style={styles.courseMeta}>
-            By {course.author} | {course.date}
+            By {course.author} | {course.date ? course.date.slice(0, 10) : "N/A"}
           </Text>
           <Text style={styles.courseDescription}>{course.description}</Text>
         </TouchableOpacity>
@@ -109,14 +107,50 @@ export default function CoursesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "lightblue" },
-  header: { fontSize: 28, fontWeight: "bold", marginBottom: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: "lightblue",
+    padding: 20,
+  },
+
+  header: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 16,
+  },
+
+  backButton: {
+    alignSelf: "flex-start",
+    backgroundColor: "#2a9d8f",
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+
+  backButtonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+
+  searchInput: {
+    backgroundColor: "#fff",
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    fontSize: 16,
+    marginBottom: 20,
+    borderColor: "#ccc",
+    borderWidth: 1,
+  },
 
   courseCard: {
-    backgroundColor: "#f9f9f9",
-    padding: 20,
+    backgroundColor: "#fefefe",
+    padding: 16,
+    borderRadius: 16,
     marginBottom: 16,
-    borderRadius: 12,
     shadowColor: "#000",
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -125,45 +159,20 @@ const styles = StyleSheet.create({
   },
 
   courseTitle: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 8,
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#222",
+    marginBottom: 6,
   },
 
   courseMeta: {
     fontSize: 13,
-    color: "#888",
-    marginBottom: 8,
+    color: "#555",
+    marginBottom: 6,
   },
 
   courseDescription: {
     fontSize: 15,
-    color: "#444",
+    color: "#333",
   },
-
-  backButton: {
-    marginBottom: 10,
-    marginTop: 20,
-    alignSelf: "flex-start",
-    backgroundColor: "#007AFF",
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-  },
-
-  backButtonText: {
-    color: "#fff",
-    fontWeight: "500",
-  },
-
-  searchInput: {
-  backgroundColor: "#fff",
-  borderRadius: 10,
-  paddingHorizontal: 12,
-  paddingVertical: 10,
-  fontSize: 16,
-  marginBottom: 20,
-  borderColor: "#ccc",
-  borderWidth: 1,
-},
 });
