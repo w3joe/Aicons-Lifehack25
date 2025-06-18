@@ -20,7 +20,7 @@ public class FirebaseConfig {
     @Bean
     public Firestore firestore() throws IOException {
         // Use a service account
-         ClassPathResource resource = new ClassPathResource("aicon-nus-lifehack2025-firebase-adminsdk-fbsvc-b7b716f590.json");
+         ClassPathResource resource = new ClassPathResource("central-learning-test-firebase-adminsdk.json");
         InputStream serviceAccount = resource.getInputStream();
 
         FirebaseOptions options = FirebaseOptions.builder()
