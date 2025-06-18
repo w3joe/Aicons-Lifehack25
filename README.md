@@ -44,7 +44,7 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
 
 ## ✨ Features
 
-### - 🔐 Secure registration and login screens
+### 🔐 Secure registration and login screens
 
 <p float="left">
   <img src="screenshots/register.png" alt="register" width="32%" />
@@ -54,7 +54,7 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
   <em>User can register for an account as a teacher or student.</em>
 </p>
 
-### - 🎨 Beautiful and intuitive mobile interface
+### 🎨 Beautiful and intuitive mobile interface
 
 <p float="left">
 <img src="screenshots/home.png" alt="home" width="32%" />
@@ -65,7 +65,7 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
   <em>Courses can be filtered by topics or queried using the search bar.</em>
 </p>
 
-### - 🏆 Accessible content to well-structured courses
+### 🏆 Accessible content to well-structured courses
 
 <p float="left">
 <img src="screenshots/course.png" alt="course" width="32%" />
@@ -75,7 +75,7 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
   <em>Lessons are completed sequentially, and users can choose to retake a lesson to refresh their memory.</em>
 </p>
 
-### - 💬 AI Q&A chat for real-time support
+### 💬 AI Q&A chat for real-time support
 
 <p float="left">
 <img src="screenshots/ask-ai.png" alt="ask-ai" width="32%" />
@@ -84,7 +84,7 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
   <em>AiTutor tailors responses based on the user's proficiency level.</em>
 </p>
 
-### - 🧠 Adaptive lessons with dynamic quiz difficulty based on previous results
+### 🧠 Adaptive lessons with dynamic quiz difficulty based on previous results
 
 <p float="left">
 <img src="screenshots/quiz.png" alt="quiz" width="32%" />
@@ -94,7 +94,7 @@ Our goal isn’t just to teach — it’s to help students feel seen, supported,
   <em>Result is calculated based on confidence level and correct answers. This will determine the next lesson's difficulty based on the users' proficiency.</em>
 </p>
 
-### - 📊 Analytics dashboard for teachers to monitor performance
+### 📊 Analytics dashboard for teachers to monitor performance
 
 <p float="left">
 <img src="screenshots/dashboard.png" alt="dashboard" width="32%" />
