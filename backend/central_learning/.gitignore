@@ -34,6 +34,7 @@ build/
 
 ### Firebase ###
 central-learning-test-firebase-adminsdk.json
+aicon-nus-lifehack2025-firebase-adminsdk-fbsvc-b7b716f590.json
 
 # Environment variables
 .env
