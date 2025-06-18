@@ -75,7 +75,7 @@ export default function CourseDetailScreen() {
   const router = useRouter();
 
   const handleBackPress = () => {
-    router.back();
+    router.push('/courses');
   };
 
   useEffect(() => {
